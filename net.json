@@ -1,0 +1,37 @@
+{
+  "nodes": [
+    {
+      "op": "null", 
+      "param": {}, 
+      "name": "A", 
+      "inputs": [], 
+      "backward_source_id": -1
+    }, 
+    {
+      "op": "null", 
+      "param": {}, 
+      "name": "B", 
+      "inputs": [], 
+      "backward_source_id": -1
+    }, 
+    {
+      "op": "_Plus", 
+      "param": {}, 
+      "name": "_plus0", 
+      "inputs": [[0, 0], [1, 0]], 
+      "backward_source_id": -1
+    }, 
+    {
+      "op": "_DivScalar", 
+      "param": {
+        "scalar": "10", 
+        "scalar_on_left": "False"
+      }, 
+      "name": "_divscalar0", 
+      "inputs": [[2, 0]], 
+      "backward_source_id": -1
+    }
+  ], 
+  "arg_nodes": [0, 1], 
+  "heads": [[3, 0]]
+}
