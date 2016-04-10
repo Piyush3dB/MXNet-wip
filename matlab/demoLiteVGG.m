@@ -7,6 +7,7 @@ clc;
 if libisloaded('libmxnet')
     unloadlibrary('libmxnet');
 end
+LABELS_FILE = '../../MXNetModels/cifar1000VGGmodel/synset.txt';
 MXNET_ROOT = [fileparts(mfilename('fullpath')), '/../../mxnet/'];
 MXNET_LIB  = [MXNET_ROOT, '/lib'];
 MXNET_SO   = [MXNET_ROOT, '/include/mxnet'];
@@ -17,11 +18,11 @@ addpath(MXNET_SO);
 assert(isempty(err));
 
 
-%% Load the model
+%% Init model pointer
 pCtx = libpointer('voidPtr', 0);
 assert(pCtx.Value == 0);
 
-%% Load Symbol and params
+%% Load Symbol and Params
 symblFile = '../../MXNetModels/cifar1000VGGmodel/Inception_BN-symbol.json';
 paramFile = '../../MXNetModels/cifar1000VGGmodel/Inception_BN-0039.params';
 Symbol = fileread(symblFile);
@@ -39,58 +40,58 @@ img = single(img) - 120;
 siz = size(img);
 assert(length(siz) >= 2);
 img = permute(img, [2 1 3:length(siz)]);
-inImg  = single(img(:));
-lenImg = uint32(numel(inImg));
 
+X_data  = single(img(:));
+X_len   = uint32(numel(X_data));
+X_dim   = int32([ones(1, 4-length(siz)), siz(end:-1:1)]);
+X_shape = uint32([0, 4]);
 
 %% Run prediction
-dev_type = int32(1); % cpu in default
-dev_id   = int32(0);
 fprintf('create predictor with input size ');
 fprintf('%d ', siz);
 fprintf('\n');
-csize = int32([ones(1, 4-length(siz)), siz(end:-1:1)]);
+
 callmxnet('MXPredCreate', ...
     Symbol, ...
     ParamsPtr, ...
     ParamsLen, ...
-    dev_type, ...
-    dev_id, ...
+    1, ...
+    0, ...
     1, ...
     {'data'}, ...
-    uint32([0, 4]), ...
-    csize, ...
+    X_shape, ...
+    X_dim, ...
     pCtx);
 
 %% feed input
-callmxnet('MXPredSetInput', pCtx, 'data', inImg, lenImg);
+callmxnet('MXPredSetInput', pCtx, 'data', X_data, X_len);
 
 %% forward
 callmxnet('MXPredForward', pCtx);
 
 %% Get the output size and allocate pointer
-out_dim   = libpointer('uint32Ptr', 0);
-out_shape = libpointer('uint32PtrPtr', ones(4,1));
+Y_dim   = libpointer('uint32Ptr', 0);
+Y_shape = libpointer('uint32PtrPtr', zeros(4,1));
 callmxnet('MXPredGetOutputShape', ...
     pCtx, ...
     0, ...
-    out_shape, ...
-    out_dim);
-assert(out_dim.Value <= 4);
-out_siz = out_shape.Value(1:out_dim.Value);
-out_siz = double(out_siz(end:-1:1))';
+    Y_shape, ...
+    Y_dim);
+assert(Y_dim.Value <= 4);
+Y_size = Y_shape.Value(1:Y_dim.Value);
+Y_size = double(Y_size(end:-1:1))';
 
 %% Get the output daya
-out = libpointer('singlePtr', single(zeros(out_siz)));
+Y_data = libpointer('singlePtr', single(zeros(Y_size)));
 
 callmxnet('MXPredGetOutput', ...
     pCtx, ...
     0, ...
-    out, ...
-    uint32(prod(out_siz)));
+    Y_data, ...
+    uint32(prod(Y_size)));
 
 % TODO convert from c order to matlab order...
-pred = reshape(out.Value, out_siz);
+pred = reshape(Y_data.Value, Y_size);
 
 %% Free the model
 callmxnet('MXPredFree', pCtx);
@@ -98,7 +99,7 @@ callmxnet('MXPredFree', pCtx);
 
 %% load the labels
 labels = {};
-fid = fopen('../../MXNetModels/cifar1000VGGmodel/synset.txt', 'r');
+fid = fopen(LABELS_FILE, 'r');
 assert(fid >= 0);
 tline = fgetl(fid);
 while ischar(tline)
