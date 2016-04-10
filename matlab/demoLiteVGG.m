@@ -24,7 +24,7 @@ assert(pCtx.Value == 0);
 %% Load Symbol and params
 symblFile = '../../MXNetModels/cifar1000VGGmodel/Inception_BN-symbol.json';
 paramFile = '../../MXNetModels/cifar1000VGGmodel/Inception_BN-0039.params';
-symbol = fileread(symblFile);
+Symbol = fileread(symblFile);
 
 fid = fopen(paramFile, 'rb');
 Params = fread(fid, inf, '*ubit8');
@@ -50,9 +50,8 @@ fprintf('create predictor with input size ');
 fprintf('%d ', siz);
 fprintf('\n');
 csize = int32([ones(1, 4-length(siz)), siz(end:-1:1)]);
-out_layers = {};
 callmxnet('MXPredCreate', ...
-    symbol, ...
+    Symbol, ...
     ParamsPtr, ...
     ParamsLen, ...
     dev_type, ...
@@ -69,8 +68,7 @@ callmxnet('MXPredSetInput', pCtx, 'data', inImg, lenImg);
 %% forward
 callmxnet('MXPredForward', pCtx);
 
-%% Get the output
-% get the i-th output
+%% Get the output size and allocate pointer
 out_dim   = libpointer('uint32Ptr', 0);
 out_shape = libpointer('uint32PtrPtr', ones(4,1));
 callmxnet('MXPredGetOutputShape', ...
@@ -82,7 +80,7 @@ assert(out_dim.Value <= 4);
 out_siz = out_shape.Value(1:out_dim.Value);
 out_siz = double(out_siz(end:-1:1))';
 
-% get output
+%% Get the output daya
 out = libpointer('singlePtr', single(zeros(out_siz)));
 
 callmxnet('MXPredGetOutput', ...
