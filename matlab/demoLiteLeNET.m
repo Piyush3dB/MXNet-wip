@@ -29,7 +29,7 @@ paramFile = '../../MXNetModels/lenetMnistModel/lenet-0010.params';
 mxObj = MXNetForwarder(symblFile, paramFile);
 
 %% Load and resize the image
-[img, labels] = readMNIST(MNIST_DATA, MNIST_LABELS, 1, 1000);
+[img, labels] = readMNIST(MNIST_DATA, MNIST_LABELS, 1, 55);
 
 %% Forward the image
 mxObj = mxObj.forward(img);
@@ -41,10 +41,12 @@ pred = mxObj.getOutput();
 mxObj = mxObj.free();
 
 %% find the predict label
-[pR, iD] = sort(pred, 'descend');
 for i = 0:9
     fprintf('%2d. Prob=%3f\n', i, pred(i+1));
 end
 
-figure;
+figure(1);
+subplot(2,1,1);
 imshow(img);
+subplot(2,1,2);
+bar([0:9], pred, 'b')
