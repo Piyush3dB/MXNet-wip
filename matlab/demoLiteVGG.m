@@ -37,8 +37,7 @@ paramFile = '../../MXNetModels/cifar1000VGGmodel/Inception_BN-0039.params';
 mxObj = MXNetForwarder(symblFile, paramFile);
 
 %% Load and resize the image
-img = imread('cat.png');
-img = imresize(img, [224 224]);
+img = imread('cat_224x224x3.png');
 img = single(img) - 120;
 siz = size(img);
 assert(length(siz) >= 2);
