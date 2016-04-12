@@ -43,7 +43,7 @@ classdef MXNetForwarder < handle
             
             img = permute(img, [2 1 3:length(siz)]);
             
-            X_data  = single(img(:));
+            X_data  = single(img(:)); % take cols and concat
             X_len   = uint32(numel(X_data));
             X_dim   = int32([ones(1, 4-length(siz)), siz(end:-1:1)]);
             X_shape = uint32([0, 4]);
