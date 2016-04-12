@@ -36,7 +36,12 @@ classdef MXNetForwarder < handle
             
         end
         
-        function obj = forward(obj, img, siz)
+        function obj = forward(obj, img)
+            
+            siz = size(img);
+            assert(length(siz) >= 2);
+            
+            img = permute(img, [2 1 3:length(siz)]);
             
             X_data  = single(img(:));
             X_len   = uint32(numel(X_data));

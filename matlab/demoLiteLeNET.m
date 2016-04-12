@@ -7,8 +7,6 @@ clc;
 if libisloaded('libmxnet')
     unloadlibrary('libmxnet');
 end
-
-LABELS_FILE = '../../MXNetModels/cifar1000VGGmodel/synset.txt';
 MXNET_ROOT = [fileparts(mfilename('fullpath')), '/../../mxnet/'];
 MXNET_LIB  = [MXNET_ROOT, '/lib'];
 MXNET_SO   = [MXNET_ROOT, '/include/mxnet'];
@@ -18,27 +16,20 @@ addpath(MXNET_SO);
 [err, warn] = loadlibrary('libmxnet.so', MXNET_HDR);
 assert(isempty(err));
 
-%% load the labels
-labels = {};
-fid = fopen(LABELS_FILE, 'r');
-assert(fid >= 0);
-tline = fgetl(fid);
-while ischar(tline)
-    labels{end+1} = tline;
-    tline = fgetl(fid);
-end
-fclose(fid);
 
 %% Load Symbol and Params
-symblFile = '../../MXNetModels/cifar1000VGGmodel/Inception_BN-symbol.json';
-paramFile = '../../MXNetModels/cifar1000VGGmodel/Inception_BN-0039.params';
+DATA_DIR = '../../MXNetModels/lenetMnistModel/mnist';
+MNIST_DATA   = fullfile(DATA_DIR, 't10k-images-idx3-ubyte');
+MNIST_LABELS = fullfile(DATA_DIR, 't10k-labels-idx1-ubyte');
+
+symblFile = '../../MXNetModels/lenetMnistModel/lenet-symbol.json';
+paramFile = '../../MXNetModels/lenetMnistModel/lenet-0010.params';
 
 %% Init object
 mxObj = MXNetForwarder(symblFile, paramFile);
 
 %% Load and resize the image
-img = imread('cat_224x224x3.png');
-img = single(img) - 120;
+[img, labels] = readMNIST(MNIST_DATA, MNIST_LABELS, 1, 1000);
 
 %% Forward the image
 mxObj = mxObj.forward(img);
@@ -51,6 +42,9 @@ mxObj = mxObj.free();
 
 %% find the predict label
 [pR, iD] = sort(pred, 'descend');
-for i = 1:10
-    fprintf('Prob=%3f %s\n', pR(i), labels{iD(i)});
+for i = 0:9
+    fprintf('%2d. Prob=%3f\n', i, pred(i+1));
 end
+
+figure;
+imshow(img);
