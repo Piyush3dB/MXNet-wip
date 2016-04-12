@@ -29,7 +29,7 @@ paramFile = '../../MXNetModels/lenetMnistModel/lenet-0010.params';
 mxObj = MXNetForwarder(symblFile, paramFile);
 
 %% Load and resize the image
-[img, labels] = readMNIST(MNIST_DATA, MNIST_LABELS, 1, 55);
+[img, labels] = readMNIST(MNIST_DATA, MNIST_LABELS, 1, 5223);
 
 %% Forward the image
 mxObj = mxObj.forward(img);
