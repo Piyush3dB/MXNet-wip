@@ -2,10 +2,12 @@
 CFLAGS=-std=c++11 -Wno-unknown-pragmas -Wall
 
 # Added for openblas
-# export OPENBLAS_ROOT=/usr/local/opt/openblas
+#export OPENBLAS_ROOT=/home/piyush/Downloads/GitHub/OpenBLAS/installed
 
-# CFLAGS+= -I${OPENBLAS_ROOT}/include
-# LDFLAGS=-L${OPENBLAS_ROOT}/lib -lopenblas
+#CFLAGS+= -I${OPENBLAS_ROOT}/include
+#CFLAGS+= -I/usr/local/include
+#LDFLAGS=-L${OPENBLAS_ROOT}/lib -lopenblas 
+#LDFLAGS=-L/usr/local/lib/
 
 # Added for opencv
 #CFLAGS+= `pkg-config --cflags opencv`

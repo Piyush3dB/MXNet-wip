@@ -16,13 +16,14 @@
 //
 
 #include <stdio.h>
+#include <assert.h>
 
 // Path for c_predict_api
 #include <mxnet/c_predict_api.h>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/contrib/contrib.hpp>
-#include <opencv2/highgui/highgui.hpp>
+//#include <opencv2/core/core.hpp>
+//#include <opencv2/contrib/contrib.hpp>
+//#include <opencv2/highgui/highgui.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -67,48 +68,6 @@ class BufferFile {
         buffer_ = NULL;
     }
 };
-
-void GetMeanFile(const std::string image_file, mx_float* image_data,
-                const int channels, const cv::Size resize_size) {
-    // Read all kinds of file into a BGR color 3 channels image
-    cv::Mat im_ori = cv::imread(image_file, 1);
-
-    if (im_ori.empty()) {
-        std::cerr << "Can't open the image. Please check " << image_file << ". \n";
-        assert(false);
-    }
-
-    cv::Mat im;
-
-    resize(im_ori, im, resize_size);
-
-    // Better to be read from a mean.nb file
-    float mean = 117.0;
-
-    int size = im.rows * im.cols * channels;
-
-    mx_float* ptr_image_r = image_data;
-    mx_float* ptr_image_g = image_data + size / 3;
-    mx_float* ptr_image_b = image_data + size / 3 * 2;
-
-    for (int i = 0; i < im.rows; i++) {
-        uchar* data = im.ptr<uchar>(i);
-
-        for (int j = 0; j < im.cols; j++) {
-            if (channels > 1)
-            {
-                mx_float b = static_cast<mx_float>(*data++) - mean;
-                mx_float g = static_cast<mx_float>(*data++) - mean;
-                *ptr_image_g++ = g;
-                *ptr_image_b++ = b;
-            }
-
-            mx_float r = static_cast<mx_float>(*data++) - mean;
-            *ptr_image_r++ = r;
-
-        }
-    }
-}
 
 // LoadSynsets
 // Code from : https://github.com/pertusa/mxnet_predict_cc/blob/master/mxnet_predict.cc
@@ -155,6 +114,9 @@ void PrintOutputResult(const std::vector<float>& data, const std::vector<std::st
 }
 
 int main(int argc, char* argv[]) {
+
+    std::cout << "\nHere in main()...\n" << std::endl;
+
     if (argc < 2) {
         std::cout << "No test image here." << std::endl
         << "Usage: ./image-classification-predict apple.jpg" << std::endl;
@@ -205,7 +167,7 @@ int main(int argc, char* argv[]) {
     std::vector<mx_float> image_data = std::vector<mx_float>(image_size);
 
     //-- Read Mean Data
-    GetMeanFile(test_file, image_data.data(), channels, cv::Size(width, height));
+    //GetMeanFile(test_file, image_data.data(), channels, cv::Size(width, height));
 
     //-- Set Input Image
     MXPredSetInput(out, "data", image_data.data(), image_size);
