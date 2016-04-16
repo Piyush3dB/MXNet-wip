@@ -1,5 +1,9 @@
 
-# copy files
+# Clean stuff
+rm -rf mxnet_predict-all.o mxnet_predict-all.cc libmxnet_predict.so image-classification-predict.o image-classification-predict
+
+
+# Copy files
 cp ../../mxnet/amalgamation/mxnet_predict-all.cc .
 
 # From amalgamation
