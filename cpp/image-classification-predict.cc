@@ -19,7 +19,7 @@
 #include <assert.h>
 
 // Path for c_predict_api
-#include <mxnet/c_predict_api.h>
+#include <c_predict_api.h>
 
 //#include <opencv2/core/core.hpp>
 //#include <opencv2/contrib/contrib.hpp>
