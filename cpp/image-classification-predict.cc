@@ -1,5 +1,4 @@
 /*!
- *  Copyright (c) 2015 by Xiao Liu, pertusa, caprice-j
  * \file image_classification-predict.cpp
  * \brief C++ predict example of mxnet
  */
@@ -8,11 +7,6 @@
 //  File: image-classification-predict.cpp
 //  This is a simple predictor which shows
 //  how to use c api for image classfication
-//  It uses opencv for image reading
-//  Created by liuxiao on 12/9/15.
-//  Thanks to : pertusa, caprice-j, sofiawu, tqchen, piiswrong
-//  Home Page: www.liuxiao.org
-//  E-mail: liuxiao@foxmail.com
 //
 
 #include <stdio.h>
@@ -69,7 +63,6 @@ class BufferFile {
 };
 
 // LoadSynsets
-// Code from : https://github.com/pertusa/mxnet_predict_cc/blob/master/mxnet_predict.cc
 std::vector<std::string> LoadSynset(const char *filename) {
     std::ifstream fi(filename);
 
@@ -180,7 +173,7 @@ int main(int argc, char* argv[]) {
                                         static_cast<mx_uint>(channels),
                                         static_cast<mx_uint>(width),
                                         static_cast<mx_uint>(height) };
-    PredictorHandle out = 0;  // alias for void *
+    PredictorHandle pCtx = 0;  // alias for void *
 
     //-- Create Predictor
     MXPredCreate((const char*)json_data.GetBuffer(),
@@ -192,14 +185,14 @@ int main(int argc, char* argv[]) {
                  input_keys,
                  input_shape_indptr,
                  input_shape_data,
-                 &out);
+                 &pCtx);
 
     //-- Set Input Image
-    MXPredSetInput(out, "data", image_data.data(), image_size);
+    MXPredSetInput(pCtx, "data", image_data.data(), image_size);
 
 
     //-- Do Predict Forward
-    MXPredForward(out);
+    MXPredForward(pCtx);
 
     mx_uint output_index = 0;
 
@@ -207,7 +200,7 @@ int main(int argc, char* argv[]) {
     mx_uint shape_len;
 
     //-- Get Output Result
-    MXPredGetOutputShape(out, output_index, &shape, &shape_len);
+    MXPredGetOutputShape(pCtx, output_index, &shape, &shape_len);
 
     size_t size = 1;
     for (mx_uint i = 0; i < shape_len; ++i) {
@@ -216,10 +209,10 @@ int main(int argc, char* argv[]) {
 
     std::vector<float> data(size);
 
-    MXPredGetOutput(out, output_index, &(data[0]), size);
+    MXPredGetOutput(pCtx, output_index, &(data[0]), size);
 
     // Release Predictor
-    MXPredFree(out);
+    MXPredFree(pCtx);
 
     // Synset path for your model, you have to modify it
     std::vector<std::string> synset = LoadSynset("../../MXNetModels/cifar1000VGGmodel/synset.txt");
@@ -227,16 +220,7 @@ int main(int argc, char* argv[]) {
     //-- Print Output Data
     PrintOutputResult(data, synset);
 
-
-
-
-
-
-    
     delete[] imAsCol;
-
-
-
 
     return 0;
 }
