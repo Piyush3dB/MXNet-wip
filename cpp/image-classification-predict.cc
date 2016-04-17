@@ -17,18 +17,17 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <stdint.h>
 
 // Path for c_predict_api
 #include <c_predict_api.h>
-
-//#include <opencv2/core/core.hpp>
-//#include <opencv2/contrib/contrib.hpp>
-//#include <opencv2/highgui/highgui.hpp>
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
+
+ #define IMAGE_BYTES (224*224*3)
 
 // Read file to buffer
 class BufferFile {
@@ -117,18 +116,51 @@ int main(int argc, char* argv[]) {
 
     std::cout << "\nHere in main()...\n" << std::endl;
 
-    if (argc < 2) {
-        std::cout << "No test image here." << std::endl
-        << "Usage: ./image-classification-predict apple.jpg" << std::endl;
-        return 0;
+    /* Read cat data */
+    std::ifstream is ("cat_224x224x3.bin", std::ifstream::binary);
+    // get length of file:
+    is.seekg (0, is.end);
+    int length = is.tellg();
+    is.seekg (0, is.beg);
+
+
+    uint8_t * imAsCol = new uint8_t [length];
+
+    std::cout << "Reading " << length << " characters... ";
+    // read data as a block:
+    is.read(reinterpret_cast<char *>(imAsCol), length);
+
+    if (is)
+      std::cout << "all characters read successfully. " << is.gcount() << " read" ;
+    else
+      std::cout << "error: only " << is.gcount() << " could be read";
+    is.close();
+
+    // ...imAsCol contains the entire file...
+    // Adjust to the mean image
+    mx_float meanAdjust = (mx_float) 120;
+    int image_size = 224 * 224 * 3;
+    std::vector<mx_float> image_data = std::vector<mx_float>(image_size);
+    mx_float* image_data_ptr = image_data.data();
+    
+    for (int j = 0; j < image_size; j++) {
+        image_data_ptr[j] = (mx_float)imAsCol[j] - meanAdjust;
+        //printf("imAsCol[%d] = %d. %f\n", j, (uint8_t)imAsCol[j], (mx_float)image_data_ptr[j]);
     }
 
-    std::string test_file;
-    test_file = std::string(argv[1]);
+
+    //for (auto i = image_data.begin(); i != image_data.end(); ++i) {
+#if 0
+    for (auto const& i : image_data) {
+        std::cout << i << ' ';
+    }
+#endif
+    std::cout << '\n';
+
 
     // Models path for your model, you have to modify it
-    BufferFile json_data("model/Inception/Inception_BN-symbol.json");
-    BufferFile param_data("model/Inception/Inception_BN-0039.params");
+    BufferFile json_data( "../../MXNetModels/cifar1000VGGmodel/Inception_BN-symbol.json");
+    BufferFile param_data("../../MXNetModels/cifar1000VGGmodel/Inception_BN-0039.params");
 
     // Parameters
     int dev_type = 1;  // 1: cpu, 2: gpu
@@ -162,15 +194,9 @@ int main(int argc, char* argv[]) {
                  input_shape_data,
                  &out);
 
-    // Just a big enough memory 1000x1000x3
-    int image_size = width * height * channels;
-    std::vector<mx_float> image_data = std::vector<mx_float>(image_size);
-
-    //-- Read Mean Data
-    //GetMeanFile(test_file, image_data.data(), channels, cv::Size(width, height));
-
     //-- Set Input Image
     MXPredSetInput(out, "data", image_data.data(), image_size);
+
 
     //-- Do Predict Forward
     MXPredForward(out);
@@ -184,7 +210,9 @@ int main(int argc, char* argv[]) {
     MXPredGetOutputShape(out, output_index, &shape, &shape_len);
 
     size_t size = 1;
-    for (mx_uint i = 0; i < shape_len; ++i) size *= shape[i];
+    for (mx_uint i = 0; i < shape_len; ++i) {
+       size *= shape[i];   
+    }
 
     std::vector<float> data(size);
 
@@ -194,10 +222,21 @@ int main(int argc, char* argv[]) {
     MXPredFree(out);
 
     // Synset path for your model, you have to modify it
-    std::vector<std::string> synset = LoadSynset("model/Inception/synset.txt");
+    std::vector<std::string> synset = LoadSynset("../../MXNetModels/cifar1000VGGmodel/synset.txt");
 
     //-- Print Output Data
     PrintOutputResult(data, synset);
+
+
+
+
+
+
+    
+    delete[] imAsCol;
+
+
+
 
     return 0;
 }
