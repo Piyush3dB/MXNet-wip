@@ -105,7 +105,7 @@ void PrintOutputResult(const std::vector<float>& data, const std::vector<std::st
     }
 
     // showing contents:
-    std::cout << "Top 5 predictions:\n";
+    std::cout << "\n\nTop 5 predictions:\n";
     it=mymultimap.rbegin();
     int i = 0;
     float pctgFlt = 0;
