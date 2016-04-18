@@ -20,6 +20,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <map>
 
  #define IMAGE_BYTES (224*224*3)
 
@@ -85,24 +86,35 @@ std::vector<std::string> LoadSynset(const char *filename) {
 }
 
 void PrintOutputResult(const std::vector<float>& data, const std::vector<std::string>& synset) {
+    
+    std::multimap<int,int> mymultimap;
+    std::multimap<int,int>::reverse_iterator it;
+
+
+
     if (data.size() != synset.size()) {
         std::cerr << "Result data and synset size does not match!" << std::endl;
     }
 
-    float best_accuracy = 0.0;
-    int best_idx = 0;
+    int pctg = 0;
 
+    // Insert into multimap
     for ( int i = 0; i < static_cast<int>(data.size()); i++ ) {
-        printf("Accuracy[%d] = %.8f\n", i, data[i]);
-
-        if ( data[i] > best_accuracy ) {
-            best_accuracy = data[i];
-            best_idx = i;
-        }
+        pctg = (int)(10000*data[i]);
+        mymultimap.insert ( std::pair<int,int>(pctg,i) );
     }
 
-    printf("Best Result: [%s] id = %d, accuracy = %.8f\n",
-    synset[best_idx].c_str(), best_idx, best_accuracy);
+    // showing contents:
+    std::cout << "Top 5 predictions:\n";
+    it=mymultimap.rbegin();
+    int i = 0;
+    float pctgFlt = 0;
+    for (i=0; i<5; i++){
+        pctgFlt = (float)((*it).first)/100;
+        printf("%3.3f => %s \n", pctgFlt, synset[(*it).second].c_str());
+        it++;
+    }
+
 }
 
 int main(int argc, char* argv[]) {

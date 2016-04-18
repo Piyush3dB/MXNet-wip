@@ -51,6 +51,6 @@ mxObj = mxObj.free();
 
 %% find the predict label
 [pR, iD] = sort(pred, 'descend');
-for i = 1:10
-    fprintf('Prob=%3f %s\n', pR(i), labels{iD(i)});
+for i = 1:5
+    fprintf('Prob=%2.3f %s\n', 100*pR(i), labels{iD(i)});
 end
