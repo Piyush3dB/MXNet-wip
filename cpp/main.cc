@@ -76,24 +76,22 @@ void SortOutputResult(const std::vector<float>& data, std::multimap<int,int> &re
 
 }
 
-/*
+
 void PrintOutputResult(const std::multimap<int,int>& resultsMap, const std::vector<std::string>& synset) {
     
-    std::multimap<int,int>::reverse_iterator it;
+        std::cout << "\n\nTop 5 predictions:\n";
+        auto it = resultsMap.rbegin();
+        int i = 0;
+        float pctgFlt = 0;
+        for (i=0; i<5; i++){
+            pctgFlt = (float)((*it).first)/100;
+            printf("%3.3f => %s \n", pctgFlt, synset[(*it).second].c_str());
+            it++;
+        }
 
-    // showing contents:
-    std::cout << "\n\nTop 5 predictions:\n";
-    it = resultsMap.rbegin();
-    int i = 0;
-    float pctgFlt = 0;
-    for (i=0; i<5; i++){
-        pctgFlt = (float)((*it).first)/100;
-        printf("%3.3f => %s \n", pctgFlt, synset[(*it).second].c_str());
-        it++;
-    }
 
 }
-*/
+
 
 
     // LoadSynsets
@@ -197,32 +195,16 @@ class MXNetForwarder {
         std::vector<float> data(size);
         MXPredGetOutput(this->pCtx, output_index, &(data[0]), size);
 
-        // Sort output result
-
-
         // Synset path for your model, you have to modify it
         std::vector<std::string> synset = LoadSynset("../../MXNetModels/cifar1000VGGmodel/synset.txt");
 
-        //-- Print Output Data
+        //-- Sort output result
         std::multimap<int,int> resultsMap;
         SortOutputResult(data, resultsMap);
-    //    PrintOutputResult(resultsMap, synset);
-
-    std::multimap<int,int>::reverse_iterator it;
-
-    // showing contents:
-    std::cout << "\n\nTop 5 predictions:\n";
-    it = resultsMap.rbegin();
-    int i = 0;
-    float pctgFlt = 0;
-    for (i=0; i<5; i++){
-        pctgFlt = (float)((*it).first)/100;
-        printf("%3.3f => %s \n", pctgFlt, synset[(*it).second].c_str());
-        it++;
-    }
-
-
-
+        
+        //-- Print Output Data
+        PrintOutputResult(resultsMap, synset);
+    
     }
 
 
