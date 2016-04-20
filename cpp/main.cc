@@ -64,11 +64,8 @@ class BufferFile {
 
 
 
-std::multimap<int,int> SortOutputResult(const std::vector<float>& data) {
+void SortOutputResult(const std::vector<float>& data, std::multimap<int,int> &resultsMap) {
     
-    std::multimap<int,int> resultsMap;
-    std::multimap<int,int>::reverse_iterator it;
-
     int pctg = 0;
 
     // Insert into multimap
@@ -77,33 +74,16 @@ std::multimap<int,int> SortOutputResult(const std::vector<float>& data) {
         resultsMap.insert ( std::pair<int,int>(pctg,i) );
     }
 
-    return resultsMap;
-
 }
 
-
-void PrintOutputResult(const std::vector<float>& data, const std::vector<std::string>& synset) {
+/*
+void PrintOutputResult(const std::multimap<int,int>& resultsMap, const std::vector<std::string>& synset) {
     
-    std::multimap<int,int> mymultimap;
     std::multimap<int,int>::reverse_iterator it;
-
-
-
-    if (data.size() != synset.size()) {
-        std::cerr << "Result data and synset size does not match!" << std::endl;
-    }
-
-    int pctg = 0;
-
-    // Insert into multimap
-    for ( int i = 0; i < static_cast<int>(data.size()); i++ ) {
-        pctg = (int)(10000*data[i]);
-        mymultimap.insert ( std::pair<int,int>(pctg,i) );
-    }
 
     // showing contents:
     std::cout << "\n\nTop 5 predictions:\n";
-    it=mymultimap.rbegin();
+    it = resultsMap.rbegin();
     int i = 0;
     float pctgFlt = 0;
     for (i=0; i<5; i++){
@@ -113,7 +93,7 @@ void PrintOutputResult(const std::vector<float>& data, const std::vector<std::st
     }
 
 }
-
+*/
 
 
     // LoadSynsets
@@ -225,8 +205,24 @@ class MXNetForwarder {
 
         //-- Print Output Data
         std::multimap<int,int> resultsMap;
-        resultsMap = SortOutputResult(data);
-        PrintOutputResult(data, synset);
+        SortOutputResult(data, resultsMap);
+    //    PrintOutputResult(resultsMap, synset);
+
+    std::multimap<int,int>::reverse_iterator it;
+
+    // showing contents:
+    std::cout << "\n\nTop 5 predictions:\n";
+    it = resultsMap.rbegin();
+    int i = 0;
+    float pctgFlt = 0;
+    for (i=0; i<5; i++){
+        pctgFlt = (float)((*it).first)/100;
+        printf("%3.3f => %s \n", pctgFlt, synset[(*it).second].c_str());
+        it++;
+    }
+
+
+
     }
 
 
