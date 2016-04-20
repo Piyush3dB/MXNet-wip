@@ -78,18 +78,15 @@ void SortOutputResult(const std::vector<float>& data, std::multimap<int,int> &re
 
 
 void PrintOutputResult(const std::multimap<int,int>& resultsMap, const std::vector<std::string>& synset) {
-    
-        std::cout << "\n\nTop 5 predictions:\n";
-        auto it = resultsMap.rbegin();
-        int i = 0;
-        float pctgFlt = 0;
-        for (i=0; i<5; i++){
-            pctgFlt = (float)((*it).first)/100;
-            printf("%3.3f => %s \n", pctgFlt, synset[(*it).second].c_str());
-            it++;
-        }
-
-
+    std::cout << "\n\nTop 5 predictions:\n";
+    auto it = resultsMap.rbegin();
+    int i = 0;
+    float pctgFlt = 0;
+    for (i=0; i<10; i++){
+        pctgFlt = (float)((*it).first)/100;
+        printf("%3.3f => %s \n", pctgFlt, synset[(*it).second].c_str());
+        it++;
+    }
 }
 
 
@@ -205,7 +202,7 @@ class MXNetForwarder {
 
 
     void Free() {
-        // Release Predictor
+        //-- Release Predictor
         MXPredFree(this->pCtx);
     }
 
@@ -213,47 +210,41 @@ class MXNetForwarder {
 };
 
 
+#define IMAGE_SIZE (224*224*3)
 
+
+
+std::vector<mx_float> LoadImage(std::string imgFname){
+
+    /* Read cat data */
+    std::ifstream is (imgFname, std::ifstream::binary);
+
+    uint8_t * imAsCol = new uint8_t [IMAGE_SIZE];
+
+    // read data as a block:
+    is.read(reinterpret_cast<char *>(imAsCol), IMAGE_SIZE);
+
+    // ...imAsCol contains the entire file...
+    // Adjust to the mean image
+    mx_float meanAdjust = (mx_float) 120;
+    std::vector<mx_float> image_data = std::vector<mx_float>(IMAGE_SIZE);
+    mx_float* image_data_ptr = image_data.data();
+    
+    for (int j = 0; j < IMAGE_SIZE; j++) {
+        image_data_ptr[j] = (mx_float)imAsCol[j] - meanAdjust;
+    }
+    std::cout << '\n';
+
+    delete[] imAsCol;
+
+    return image_data;
+}
 
 int main(int argc, char* argv[]) {
 
     std::cout << "\nHere in main()...\n" << std::endl;
 
-
-
-///////////////////////
-    /* Read cat data */
-    std::ifstream is ("cat_224x224x3.bin", std::ifstream::binary);
-    // get length of file:
-    is.seekg (0, is.end);
-    int length = is.tellg();
-    is.seekg (0, is.beg);
-
-    uint8_t * imAsCol = new uint8_t [length];
-
-    std::cout << "Reading " << length << " characters... ";
-    // read data as a block:
-    is.read(reinterpret_cast<char *>(imAsCol), length);
-
-    if (is)
-      std::cout << "all characters read successfully. " << is.gcount() << " read" ;
-    else
-      std::cout << "error: only " << is.gcount() << " could be read";
-    is.close();
-
-    // ...imAsCol contains the entire file...
-    // Adjust to the mean image
-    mx_float meanAdjust = (mx_float) 120;
-    int image_size = 224 * 224 * 3;
-    std::vector<mx_float> image_data = std::vector<mx_float>(image_size);
-    mx_float* image_data_ptr = image_data.data();
-    
-    for (int j = 0; j < image_size; j++) {
-        image_data_ptr[j] = (mx_float)imAsCol[j] - meanAdjust;
-    }
-    std::cout << '\n';
-///////////////////////
-
+    auto image_data = LoadImage("cat_224x224x3.bin");
 
     std::cout << "Constructor...\n";
     MXNetForwarder mxObj(224, 224, 3);
@@ -268,10 +259,11 @@ int main(int argc, char* argv[]) {
     mxObj.Free();
 
     //-- Print Output Data
+    std::cout << "Sort and display predictions...\n";
     auto synset = LoadSynset("../../MXNetModels/cifar1000VGGmodel/synset.txt");
     PrintOutputResult(resultsMap, synset);
 
-    delete[] imAsCol;
+    
 
     return 0;
 }
