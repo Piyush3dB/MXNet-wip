@@ -64,21 +64,22 @@ class BufferFile {
 
 
 
-void SortOutputResult(const std::vector<float>& data, std::multimap<int,int> &resultsMap) {
+std::multimap<int,int> SortOutputResult(const std::vector<float>& data) {
     
     int pctg = 0;
+    std::multimap<int,int> resultsMap;
 
     // Insert into multimap
     for ( int i = 0; i < static_cast<int>(data.size()); i++ ) {
         pctg = (int)(10000*data[i]);
         resultsMap.insert ( std::pair<int,int>(pctg,i) );
     }
-
+    return resultsMap;
 }
 
 
 void PrintOutputResult(const std::multimap<int,int>& resultsMap, const std::vector<std::string>& synset) {
-    std::cout << "\n\nTop 5 predictions:\n";
+    std::cout << "\nTop 5 predictions:\n";
     auto it = resultsMap.rbegin();
     int i = 0;
     float pctgFlt = 0;
@@ -125,22 +126,21 @@ class MXNetForwarder {
     /* Handler context for predictor */
     PredictorHandle pCtx = nullptr;
 
-    /* Json string */
-    std::string SymbolJson;
+    /* Json symbol string */
+    const char* SymbolJson;
+
+    /* Network parameters */
+    const char* NetParams;
 
     /* Image dimension */
     int image_size = 0;
 
 
     /* Constructor */
-    MXNetForwarder(int w, int h, int c){
+    MXNetForwarder(int w, int h, int c, const char* SymbolJson, const char* NetParams, int paramLen){
 
-        // Image dimenstions and size
+        // Image dimenstions and size used during forwarding
         this->image_size = w*h*c;
-
-        // Models path for your model, you have to modify it
-        BufferFile json_data( "../../MXNetModels/cifar1000VGGmodel/Inception_BN-symbol.json");
-        BufferFile param_data("../../MXNetModels/cifar1000VGGmodel/Inception_BN-0039.params");
 
         // Parameters
         const char* input_key[1] = {"data"};
@@ -153,9 +153,9 @@ class MXNetForwarder {
                                             static_cast<mx_uint>(h) };
 
         //-- Create Predictor
-        MXPredCreate((const char*)json_data.GetBuffer(),
-                     (const char*)param_data.GetBuffer(),
-                     static_cast<size_t>(param_data.GetLength()),
+        MXPredCreate(SymbolJson,
+                     NetParams,
+                     paramLen,
                      1,
                      0,
                      1,
@@ -179,10 +179,9 @@ class MXNetForwarder {
     std::multimap<int,int> GetOutput(){
         
         //-- Get Output shape and size
-        mx_uint output_index = 0;
         mx_uint *shape = 0;
         mx_uint shape_len;
-        MXPredGetOutputShape(this->pCtx, output_index, &shape, &shape_len);
+        MXPredGetOutputShape(this->pCtx, 0, &shape, &shape_len);
         size_t size = 1;
         for (mx_uint i = 0; i < shape_len; ++i) {
            size *= shape[i];   
@@ -190,11 +189,10 @@ class MXNetForwarder {
 
         //-- Get Output result
         std::vector<float> data(size);
-        MXPredGetOutput(this->pCtx, output_index, &(data[0]), size);
+        MXPredGetOutput(this->pCtx, 0, &(data[0]), size);
 
-        //-- Sort output result according to probability
-        std::multimap<int,int> resultsMap;
-        SortOutputResult(data, resultsMap);
+        //-- Sort output result according to probability values
+        auto resultsMap = SortOutputResult(data);
 
         return resultsMap;
     
@@ -202,7 +200,7 @@ class MXNetForwarder {
 
 
     void Free() {
-        //-- Release Predictor
+        //-- Release Predictor context
         MXPredFree(this->pCtx);
     }
 
@@ -216,7 +214,7 @@ class MXNetForwarder {
 
 std::vector<mx_float> LoadImage(std::string imgFname){
 
-    /* Read cat data */
+    /* Read image data */
     std::ifstream is (imgFname, std::ifstream::binary);
 
     uint8_t * imAsCol = new uint8_t [IMAGE_SIZE];
@@ -224,46 +222,56 @@ std::vector<mx_float> LoadImage(std::string imgFname){
     // read data as a block:
     is.read(reinterpret_cast<char *>(imAsCol), IMAGE_SIZE);
 
-    // ...imAsCol contains the entire file...
     // Adjust to the mean image
-    mx_float meanAdjust = (mx_float) 120;
-    std::vector<mx_float> image_data = std::vector<mx_float>(IMAGE_SIZE);
-    mx_float* image_data_ptr = image_data.data();
+    mx_float meanAdjValue = (mx_float) 120;
+    std::vector<mx_float> adjImage = std::vector<mx_float>(IMAGE_SIZE);
+    mx_float* adjImage_ptr = adjImage.data();
     
     for (int j = 0; j < IMAGE_SIZE; j++) {
-        image_data_ptr[j] = (mx_float)imAsCol[j] - meanAdjust;
+        adjImage_ptr[j] = (mx_float)imAsCol[j] - meanAdjValue;
     }
-    std::cout << '\n';
 
     delete[] imAsCol;
 
-    return image_data;
+    return adjImage;
 }
+
+
 
 int main(int argc, char* argv[]) {
 
-    std::cout << "\nHere in main()...\n" << std::endl;
-
+    //-- Load the input image
+    std::cout << "\nLoading image...\n";
     auto image_data = LoadImage("cat_224x224x3.bin");
 
-    std::cout << "Constructor...\n";
-    MXNetForwarder mxObj(224, 224, 3);
+    //-- Load MXNet network and parameters
+    std::cout << "\nLoading network parameters...\n";
+    BufferFile json_data( "../../MXNetModels/cifar1000VGGmodel/Inception_BN-symbol.json");
+    BufferFile param_data("../../MXNetModels/cifar1000VGGmodel/Inception_BN-0039.params");
 
+    //-- Create Forwarder context
+    std::cout << "Constructor...\n";
+    auto symb   = (const char *) json_data.GetBuffer();
+    auto param  = (const char *) param_data.GetBuffer();
+    auto nParam = static_cast<size_t>(param_data.GetLength());
+    MXNetForwarder mxObj(224, 224, 3, symb, param, nParam);
+
+    //-- Forward the image throught the network
     std::cout << "Forward data...\n";
     mxObj.Forward(image_data);
 
+    //-- Retireve output probability map
     std::cout << "Retireve output...\n";
     auto resultsMap = mxObj.GetOutput();
 
+    //-- Release predictor context
     std::cout << "Freeing...\n";
     mxObj.Free();
 
-    //-- Print Output Data
+    //-- Display results
     std::cout << "Sort and display predictions...\n";
     auto synset = LoadSynset("../../MXNetModels/cifar1000VGGmodel/synset.txt");
     PrintOutputResult(resultsMap, synset);
-
-    
 
     return 0;
 }
