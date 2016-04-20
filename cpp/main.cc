@@ -126,7 +126,7 @@ class MXNetForwarder {
   public:
 
     /* Handler context for predictor */
-    PredictorHandle pCtx = 0;
+    PredictorHandle pCtx = nullptr;
 
     /* Json string */
     std::string SymbolJson;
@@ -179,7 +179,7 @@ class MXNetForwarder {
     }
 
 
-    void GetOutput(){
+    std::multimap<int,int> GetOutput(){
         
         //-- Get Output shape and size
         mx_uint output_index = 0;
@@ -195,15 +195,11 @@ class MXNetForwarder {
         std::vector<float> data(size);
         MXPredGetOutput(this->pCtx, output_index, &(data[0]), size);
 
-        // Synset path for your model, you have to modify it
-        std::vector<std::string> synset = LoadSynset("../../MXNetModels/cifar1000VGGmodel/synset.txt");
-
-        //-- Sort output result
+        //-- Sort output result according to probability
         std::multimap<int,int> resultsMap;
         SortOutputResult(data, resultsMap);
-        
-        //-- Print Output Data
-        PrintOutputResult(resultsMap, synset);
+
+        return resultsMap;
     
     }
 
@@ -265,12 +261,15 @@ int main(int argc, char* argv[]) {
     std::cout << "Forward data...\n";
     mxObj.Forward(image_data);
 
-
     std::cout << "Retireve output...\n";
-    mxObj.GetOutput();
+    auto resultsMap = mxObj.GetOutput();
 
     std::cout << "Freeing...\n";
     mxObj.Free();
+
+    //-- Print Output Data
+    auto synset = LoadSynset("../../MXNetModels/cifar1000VGGmodel/synset.txt");
+    PrintOutputResult(resultsMap, synset);
 
     delete[] imAsCol;
 
