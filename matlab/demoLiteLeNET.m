@@ -32,6 +32,8 @@ mxObj = MXNetForwarder(symblFile, paramFile);
 [img, labels] = readMNIST(MNIST_DATA, MNIST_LABELS, 1, 0);
 
 %% Forward the image
+
+
 mxObj = mxObj.forward(img);
 
 %% Retrieve output
