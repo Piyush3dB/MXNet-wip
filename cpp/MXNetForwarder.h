@@ -1,18 +1,9 @@
 
 #ifndef MXNET_FORWARDER_H_
 #define MXNET_FORWARDER_H_
-
-
-#include <stdio.h>
-#include <assert.h>
-#include <stdint.h>
-
 // Path for c_predict_api
 #include <c_predict_api.h>
 
-#include <iostream>
-#include <fstream>
-#include <string>
 #include <vector>
 #include <map>
 
@@ -45,6 +36,7 @@ class MXNetForwarder {
     void Free();
 
 };
+
 
 
 

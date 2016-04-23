@@ -110,26 +110,23 @@ std::vector<std::string> LoadSynset(const char *filename) {
 
 
 
-#define IMAGE_SIZE (224*224*3)
 
-
-
-std::vector<mx_float> LoadImage(std::string imgFname){
+std::vector<mx_float> LoadImage(std::string imgFname, int imgSize){
 
     /* Read image data */
     std::ifstream is (imgFname, std::ifstream::binary);
 
-    uint8_t * imAsCol = new uint8_t [IMAGE_SIZE];
+    uint8_t * imAsCol = new uint8_t [imgSize];
 
     // read data as a block:
-    is.read(reinterpret_cast<char *>(imAsCol), IMAGE_SIZE);
+    is.read(reinterpret_cast<char *>(imAsCol), imgSize);
 
     // Adjust to the mean image
     mx_float meanAdjValue = (mx_float) 120;
-    std::vector<mx_float> adjImage = std::vector<mx_float>(IMAGE_SIZE);
+    std::vector<mx_float> adjImage = std::vector<mx_float>(imgSize);
     mx_float* adjImage_ptr = adjImage.data();
     
-    for (int j = 0; j < IMAGE_SIZE; j++) {
+    for (int j = 0; j < imgSize; j++) {
         adjImage_ptr[j] = (mx_float)imAsCol[j] - meanAdjValue;
     }
 
@@ -144,7 +141,7 @@ int main(int argc, char* argv[]) {
 
     //-- Load the input image
     std::cout << "\nLoading image...\n";
-    auto image_data = LoadImage("cat_224x224x3.bin");
+    auto image_data = LoadImage("cat_224x224x3.bin", (224*224*3));
 
     //-- Load MXNet network and parameters
     std::cout << "\nLoading network parameters...\n";

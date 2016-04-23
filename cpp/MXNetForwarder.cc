@@ -1,21 +1,6 @@
-
-
-#include <stdio.h>
-#include <assert.h>
-#include <stdint.h>
-
 // Path for c_predict_api
 #include <c_predict_api.h>
 #include <MXNetForwarder.h>
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <map>
-
-
-
 
     /* Constructor */
 MXNetForwarder::MXNetForwarder(int w, int h, int c, const char* SymbolJson, const char* NetParams, int paramLen){
@@ -70,6 +55,7 @@ std::multimap<int,int> MXNetForwarder::SortOutputResult(const std::vector<float>
     return resultsMap;
 }
 
+
 std::multimap<int,int> MXNetForwarder::GetOutput(){
     
     //-- Get Output shape and size
@@ -80,6 +66,8 @@ std::multimap<int,int> MXNetForwarder::GetOutput(){
     for (mx_uint i = 0; i < shape_len; ++i) {
        size *= shape[i];   
     }
+
+    printf("Size %d. Shape %d: [%d, %d]\n", size, shape_len, shape[0], shape[1]);
     
     //-- Get Output result
     std::vector<float> data(size);
@@ -99,4 +87,6 @@ void MXNetForwarder::Free() {
 
 
 
+
+////
 
