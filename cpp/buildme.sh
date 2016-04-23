@@ -12,6 +12,7 @@ g++ -std=c++11 -I../../OpenBLAS/installed -fPIC -o mxnet_predict-all.o -c mxnet_
 
 # From cpp test
 g++ -O3 -c main.cc -std=c++11 -I../../OpenBLAS/installed/include -I./ 
-g++ -O3 -o app main.o mxnet_predict-all.o -L../../OpenBLAS/installed/lib -lopenblas
+g++ -O3 -c MXNetForwarder.cc -std=c++11 -I../../OpenBLAS/installed/include -I./ 
+g++ -O3 -o app main.o MXNetForwarder.o mxnet_predict-all.o -L../../OpenBLAS/installed/lib -lopenblas
 
 
