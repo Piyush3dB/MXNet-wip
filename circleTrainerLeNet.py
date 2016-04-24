@@ -3,6 +3,8 @@ import skimage.draw as draw
 import skimage.io as io
 import mxnet as mx
 import logging
+import matplotlib.pyplot as plt
+
 import pdb as pdb
 
 # create logger with 'spam_application'
@@ -38,7 +40,10 @@ def drawRandomCircle():
     r = np.random.randint(10, int(Reso*0.4))
     x = np.random.randint(r-1, Reso-r-1)
     y = np.random.randint(r-1, Reso-r-1)
-    return drawShape(draw.circle, x, y, r)
+    img = drawShape(draw.circle, x, y, r)
+    #plt.imshow(img)
+    #plt.show()
+    return img
 
 def drawRandomRectange():
     a = np.random.randint(20, int(Reso*0.8))
@@ -47,7 +52,10 @@ def drawRandomRectange():
     y = np.random.randint(0, (Reso-a-1))
     vertices_yaxis = np.array([y, (y+a), (y+a), y])
     vertices_xaxis = np.array([x, x,     (x+a), (x+a)])
-    return drawShape(draw.polygon, vertices_yaxis, vertices_xaxis)
+    img = drawShape(draw.polygon, vertices_yaxis, vertices_xaxis)
+    plt.imshow(img)
+    plt.show()
+    return img
 
 
 X = np.zeros((N, 1, Reso, Reso), dtype=np.uint8)
@@ -70,6 +78,7 @@ trainN = int(N*0.6)
 trainIter = mx.io.NDArrayIter(X[:trainN, :, :, :], label=y[:trainN], batch_size=32, shuffle=False, last_batch_handle='pad')
 valIter = mx.io.NDArrayIter(X[trainN:, :, :, :], label=y[trainN:], batch_size=32, shuffle=False, last_batch_handle='pad')
 
+pdb.set_trace()
 
 def get_lenet():
     """
