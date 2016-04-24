@@ -12,31 +12,31 @@ logger.setLevel(logging.DEBUG)
 ## Network Definition
 ###
 
-def getLenet():
+def getMLP():
     # Variables are place holders for input arrays. We give each variable a unique name.
     data = mx.symbol.Variable('data')
     
     # The input is fed to a fully connected layer that computes Y=WX+b.
     # This is the main computation module in the network.
     # Each layer also needs an unique name. We'll talk more about naming in the next section.
-    fc1  = mx.symbol.FullyConnected(data = data, name='fc1', num_hidden=128)
+    fc1  = mx.symbol.FullyConnected(data = data,  name='fc1', num_hidden=128)
     # Activation layers apply a non-linear function on the previous layer's output.
     # Here we use Rectified Linear Unit (ReLU) that computes Y = max(X, 0).
-    act1 = mx.symbol.Activation(data = fc1, name='relu1', act_type="relu")
+    act1 = mx.symbol.Activation(    data = fc1,  name='relu1', act_type="relu")
     
     fc2  = mx.symbol.FullyConnected(data = act1, name = 'fc2', num_hidden = 64)
-    act2 = mx.symbol.Activation(data = fc2, name='relu2', act_type="relu")
+    act2 = mx.symbol.Activation(    data = fc2,  name='relu2', act_type="relu")
     
     fc3  = mx.symbol.FullyConnected(data = act2, name='fc3', num_hidden=10)
     # Finally we have a loss layer that compares the network's output with label and generates gradient signals.
-    mlp  = mx.symbol.SoftmaxOutput(data = fc3, name = 'softmax')
+    mlp  = mx.symbol.SoftmaxOutput( data = fc3,  name = 'softmax')
     return mlp
 
 
 ###
 ## Visulaise network
 ###
-mlp = getLenet();
+mlp = getMLP();
 net = mlp
 v = mx.viz.plot_network(net, shape={"data":(1, 1, 28, 28)})
 v.render("LeNet simple")
