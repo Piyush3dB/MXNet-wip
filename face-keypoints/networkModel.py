@@ -1,7 +1,9 @@
 import mxnet as mx
-from data_shape import load
+from load_data import load
 from sklearn.cross_validation import train_test_split
 import logging
+
+
 def get_lenet():
     data = mx.symbol.Variable('data')
     # first conv

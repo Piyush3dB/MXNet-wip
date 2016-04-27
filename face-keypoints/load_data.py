@@ -3,8 +3,8 @@ import numpy as np
 from pandas.io.parsers import read_csv
 from sklearn.utils import shuffle
 
-FTRAIN = 'training.csv'
-FTEST = 'test.csv'
+FTRAIN = '/home/piyush/Downloads/Kaggle/Facial-Keypoints/training.csv'
+FTEST = '/home/piyush/Downloads/Kaggle/Facial-Keypoints/test.csv'
 
 
 def load(test=False, cols=None):
