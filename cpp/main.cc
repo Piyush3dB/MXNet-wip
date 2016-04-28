@@ -82,7 +82,7 @@ void PrintOutputResult(const std::multimap<int,int>& resultsMap, const std::vect
 
 
 
-    // LoadSynsets
+// LoadSynsets
 std::vector<std::string> LoadSynset(const char *filename) {
     std::ifstream fi(filename);
 
