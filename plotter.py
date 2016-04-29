@@ -8,6 +8,97 @@ import pdb as pdb
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
+### Lightened CNN
+
+
+def group(data, num_r, num, kernel, stride, pad, layer):
+    if num_r > 0:
+        conv_r = mx.symbol.Convolution(data=data, num_filter=num_r, kernel=(1,1), name=('conv%s_r' % layer))
+        slice_r = mx.symbol.SliceChannel(data=conv_r, num_outputs=2, name=('slice%s_r' % layer))
+        mfm_r = mx.symbol.maximum(slice_r[0], slice_r[1])
+        conv = mx.symbol.Convolution(data=mfm_r, kernel=kernel, stride=stride, pad=pad, num_filter=num, name=('conv%s' % layer))
+    else:
+        conv = mx.symbol.Convolution(data=data, kernel=kernel, stride=stride, pad=pad, num_filter=num, name=('conv%s' % layer))
+    slice = mx.symbol.SliceChannel(data=conv, num_outputs=2, name=('slice%s' % layer))
+    mfm = mx.symbol.maximum(slice[0], slice[1])
+    pool = mx.symbol.Pooling(data=mfm, pool_type="max", kernel=(2, 2), stride=(2,2), name=('pool%s' % layer))
+    return pool
+
+def lightened_cnn_a_feature():
+    data = mx.symbol.Variable(name="data")
+    pool1 = group(data, 0, 96, (9,9), (1,1), (0,0), str(1))
+    pool2 = group(pool1, 0, 192, (5,5), (1,1), (0,0), str(2))
+    pool3 = group(pool2, 0, 256, (5,5), (1,1), (0,0), str(3))
+    pool4 = group(pool3, 0, 384, (4,4), (1,1), (0,0), str(4))
+    flatten = mx.symbol.Flatten(data=pool4)
+    fc1 = mx.symbol.FullyConnected(data=flatten, num_hidden=512, name="fc1")
+    slice_fc1 = mx.symbol.SliceChannel(data=fc1, num_outputs=2, name="slice_fc1")
+    mfm_fc1 = mx.symbol.maximum(slice_fc1[0], slice_fc1[1])
+    drop1 = mx.symbol.Dropout(data=mfm_fc1, p=0.7, name="drop1")
+    return drop1
+
+def lightened_cnn_a(num_classes=10575):
+     drop1 = lightened_cnn_a_feature()
+     fc2 = mx.symbol.FullyConnected(data=drop1, num_hidden=num_classes, name="fc2")
+     softmax = mx.symbol.SoftmaxOutput(data=fc2, name='softmax')
+     
+     group = mx.symbol.Group([drop1, fc2, softmax])
+
+     return softmax, group
+
+def lightened_cnn_b_feature():
+     data = mx.symbol.Variable(name="data")
+     pool1 = group(data, 0, 96, (5,5), (1,1), (2,2), str(1))
+     pool2 = group(pool1, 96, 192, (3,3), (1,1), (1,1), str(2))
+     pool3 = group(pool2, 192, 384, (3,3), (1,1), (1,1), str(3))
+     pool4 = group(pool3, 384, 256, (3,3), (1,1), (1,1), str(4))
+     pool5 = group(pool4, 256, 256, (3,3), (1,1), (1,1), str(5))
+     flatten = mx.symbol.Flatten(data=pool5)
+     fc1 = mx.symbol.FullyConnected(data=flatten, num_hidden=512, name="fc1")
+     slice_fc1 = mx.symbol.SliceChannel(data=fc1, num_outputs=2, name="slice_fc1")
+     mfm_fc1 = mx.symbol.maximum(slice_fc1[0], slice_fc1[1])
+     drop1 = mx.symbol.Dropout(data=mfm_fc1, p=0.7, name="drop1")
+     return drop1
+
+def lightened_cnn_b(num_classes=10575):
+     drop1 = lightened_cnn_b_feature()
+     fc2 = mx.symbol.FullyConnected(data=drop1, num_hidden=num_classes, name="fc2")
+     softmax = mx.symbol.SoftmaxOutput(data=fc2, name='softmax')
+     
+     group = mx.symbol.Group([drop1, fc2, softmax])
+     
+     return softmax, group
+
+
+###
+
+
+def get_mlp_like_convnet():
+    """
+    multi-layer perceptron
+    """
+    data = mx.symbol.Variable('data')
+
+    #fc1  = mx.symbol.FullyConnected(data=data, name='fc1',   num_hidden=128 )
+    conv1 = mx.symbol.Convolution(data=data ,  kernel=(28,28), num_filter=128)
+    act1  = mx.symbol.Activation( data=conv1,  name='relu1'  , act_type="relu")
+
+    #fc2  = mx.symbol.FullyConnected(data=act1, name='fc2',   num_hidden = 64)
+    conv2 = mx.symbol.Convolution(data=act1 ,  kernel=(1,1), num_filter=64)
+    act2  = mx.symbol.Activation( data=conv2  ,  name='relu2', act_type="relu")
+
+    #fc3  = mx.symbol.FullyConnected(data=flatten, name='fc3',   num_hidden=10  )
+    conv3 = mx.symbol.Convolution(data=act2 ,  kernel=(1,1), num_filter=10)
+    
+    flatten = mx.symbol.Flatten(   data=conv3)
+    
+    mlp  = mx.symbol.SoftmaxOutput(data=flatten,  name='softmax'               )
+    
+    group = mx.symbol.Group([data, conv1, act1, conv2, act2, conv3, flatten, mlp])
+
+
+    return mlp, group
+
 
 
 
@@ -364,16 +455,22 @@ def getMLP():
 
 
 
+# Lightened CNN
+input_size = (1,1,128,128)
+#net, group = lightened_cnn_b()
+net, group = lightened_cnn_a()
 
-input_size = (1,1,28,28)
-net, group = get_lenet()
+
+#input_size = (1,1,28,28)
+#net, group = get_lenet()
+#net, group = get_mlp_like_convnet()
 
 
-input_size = (1,1,1,28*28)
-net, group = getMLP()
+#input_size = (1,1,1,28*28)
+#net, group = getMLP()
 
-input_size = (1,3, 224, 224)
-net, group = get_symbol_squeeze()
+#input_size = (1,3, 224, 224)
+#net, group = get_symbol_squeeze()
 #net, group = get_symbol_vgg()
 #net, group = get_symbol_alexnet()
 
@@ -403,7 +500,8 @@ for i in range(0,len(arg_shapes)):
     nWtot += nW
     print '%35s -> %25s = %10s' % (arg_names[i], str(arg_shapes[i]), str(nW))
 
-print 'Total weights = %d' % (nWtot)
+print 'Total weights   = %d' % (nWtot)
+print 'Total weights M = %f' % (nWtot/1000000.)
 
 
 # Display
@@ -412,5 +510,5 @@ for i in xrange(len(output_names)):
     print '%35s -> %25s = %10s' % (output_names[i], output_shapes[i], str(mltp(output_shapes[i])))
 
 
-pdb.set_trace()
+#pdb.set_trace()
 
