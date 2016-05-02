@@ -4,6 +4,8 @@ function callmxnet(func, varargin)
 assert(ischar(func));
 disp(['++Calling ' func ]);
 ret = calllib('libmxnet', func, varargin{:});
+%ret
+
 assert(ret == 0);
 
 end

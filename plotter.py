@@ -424,7 +424,6 @@ def mltp(x):
     s = 1
     for i in range(0,len(x)):
         s *= x[i]
-
     return s
 
 
@@ -455,11 +454,49 @@ def getMLP():
 
 
 
+def printNetwork(group, input_size):
+
+    def mltp(x):
+        s = 1
+        for i in range(0,len(x)):
+            s *= x[i]
+        return s
+
+    
+    # Get list of arg and output names
+    arg_names    = group.list_arguments()
+    output_names = group.list_outputs()
+    
+    # Infer arg and output shapes
+    arg_shapes, output_shapes, aux_shapes = group.infer_shape(data=input_size)
+    
+    
+    # Display
+    nWtot = 0
+    print "Layer Params... "
+    for i in range(0,len(arg_shapes)):
+        nW = mltp(arg_shapes[i])
+        nWtot += nW
+        print '%35s -> %25s = %10s' % (arg_names[i], str(arg_shapes[i]), str(nW))
+    
+    print 'Total weights   = %d' % (nWtot)
+    print 'Total weights M = %f' % (nWtot/1000000.)
+    
+    
+    # Display
+    print "Layer Outputs... "
+    for i in xrange(len(output_names)):
+        print '%35s -> %25s = %10s' % (output_names[i], output_shapes[i], str(mltp(output_shapes[i])))
+    
+    
+    
+
 # Lightened CNN
 input_size = (1,1,128,128)
 #net, group = lightened_cnn_b()
 net, group = lightened_cnn_a()
 
+pdb.set_trace()
 
 #input_size = (1,1,28,28)
 #net, group = get_lenet()
