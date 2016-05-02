@@ -21,15 +21,16 @@ for i = 0:9
           figure;
           im = img(:,:,j);
           im = floor(im*255)
+          im = im(1:2:end, 1:2:end);
           imshow(im);
           str = sprintf('i=%d, %d', i, labels(j) );
           disp(str);
           
           tow = floor(im(:)*255)
           
-          fid = fopen(['digit' num2str(i) '.bin'], 'wb');
-          fwrite(fid, im(:));
-          fclose(fid);
+          %fid = fopen(['digit' num2str(i) '.bin'], 'wb');
+          %fwrite(fid, im(:));
+          %fclose(fid);
           
           
           break;
