@@ -9,18 +9,21 @@ head = '%(asctime)-15s Node['  + '] %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=head)
 #logging.info('start with arguments %s', args)
 
-
+# Generate 101 training points
 trX = np.linspace(-1, 1, 101)
-trY = 2 * trX + np.random.randn(*trX.shape) * 0.33
+trY = 2 * trX + np.random.randn(*trX.shape) * 0.33 * 0
 
 X = mx.sym.Variable('data')
 Y = mx.sym.Variable('softmax_label')
 
 Y_ = mx.sym.FullyConnected(data=X, num_hidden=1)
-
 cost = mx.sym.LinearRegressionOutput(data=Y_, label=Y)
 
-model = mx.model.FeedForward(symbol=cost, num_epoch=10000, learning_rate=0.01, epoch_size=1, numpy_batch_size=1, ctx=mx.gpu(0))
+# Shape inference:
+cost.infer_shape(data=(1,1,1,1))
+
+
+model = mx.model.FeedForward(symbol=cost, num_epoch=1000, learning_rate=0.01, epoch_size=1, numpy_batch_size=1, ctx=mx.cpu(0))
 
 
 batch_end_callback = []
