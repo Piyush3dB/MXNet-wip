@@ -40,12 +40,13 @@ print net.infer_shape(data=(1,1,1,1))
 ##
 batch_end_callback = []
 batch_end_callback.append(mx.callback.Speedometer(1,1))
+#batch_end_callback.append(mx.callback.ProgressBar(100))
 
 
 ##
 # Train the model
 ##
-model = mx.model.FeedForward(symbol=net, num_epoch=1000, learning_rate=0.01, epoch_size=1, numpy_batch_size=1, ctx=mx.cpu(0))
+model = mx.model.FeedForward(symbol=net, num_epoch=100, learning_rate=0.01, epoch_size=1, numpy_batch_size=1, ctx=mx.cpu(0))
 print "Start training:"
 model.fit(X=trX, y=trY, batch_end_callback = batch_end_callback)
 
@@ -60,7 +61,7 @@ b = model.arg_params['fullyconnected0_bias'].asnumpy()[0]
 plt.plot(trX, trY, 'ro', label='Original data')
 plt.plot(trX, W*trX+b, label='Fitted line')
 plt.legend()
-plt.show()
+#plt.show()
 
 
 print "Model params after training:"
@@ -73,3 +74,9 @@ print b
 ##
 print {k:v.asnumpy() for k,v in model.arg_params.items()}
 
+
+##
+# For profiling:
+##
+#python -m cProfile -o profile_data.pyprof ./linearRegression.py
+#python ./pyprof2calltree.py -i profile_data.pyprof -k
