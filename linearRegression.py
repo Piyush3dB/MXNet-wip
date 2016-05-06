@@ -6,6 +6,7 @@ import pdb as pdb
 import matplotlib.pyplot as plt
 
 
+
 ##
 # Setup logging
 ##
@@ -15,11 +16,22 @@ logging.basicConfig(level=logging.DEBUG, format=head)
 ##
 # Generate 101 training points
 ##
-trX = np.linspace(-1, 1, 101)
-trY = 2 * trX + np.random.randn(*trX.shape) * 0.33 * 1
+#trX = np.linspace(-1, 1, 101)
+#trY = 2 * trX + np.random.randn(*trX.shape) * 0.33 * 1
 
-trX = np.asarray([3.3,4.4,5.5,6.71,6.93,4.168,9.779,6.182,7.59,2.167,7.042,10.791,5.313,7.997,5.654,9.27,3.1])
-trY = np.asarray([1.7,2.76,2.09,3.19,1.694,1.573,3.366,2.596,2.53,1.221,2.827,3.465,1.65,2.904,2.42,2.94,1.3])
+X = np.asarray([3.3,4.4,5.5,6.71,6.93,4.168,9.779,6.182,7.59,2.167,7.042,10.791,5.313,7.997,5.654,9.27,3.1])
+Y = np.asarray([1.7,2.76,2.09,3.19,1.694,1.573,3.366,2.596,2.53,1.221,2.827,3.465,1.65,2.904,2.42,2.94,1.3])
+
+if 1:
+    trX = X
+    trY = Y
+else:
+    trX = mx.io.NDArrayIter(X, label=X, batch_size=1, shuffle=True, last_batch_handle='pad')
+    trY = mx.io.NDArrayIter(Y, label=Y, batch_size=1, shuffle=True, last_batch_handle='pad')
+
+
+
+
 
 ##
 # Define network
@@ -58,8 +70,8 @@ b = model.arg_params['fullyconnected0_bias'].asnumpy()[0]
 ##
 # Show results
 ##
-plt.plot(trX, trY, 'ro', label='Original data')
-plt.plot(trX, W*trX+b, label='Fitted line')
+plt.plot(X, Y, 'ro', label='Original data')
+plt.plot(X, W*X+b, label='Fitted line')
 plt.legend()
 #plt.show()
 
@@ -80,3 +92,9 @@ print {k:v.asnumpy() for k,v in model.arg_params.items()}
 ##
 #python -m cProfile -o profile_data.pyprof ./linearRegression.py
 #python ./pyprof2calltree.py -i profile_data.pyprof -k
+
+#Model params after training:
+#[ 0.29068446]
+#0.145405
+#{'fullyconnected0_weight': array([[ 0.29068446]], dtype=float32), 'fullyconnected0_bias': array([ 0.14540534], dtype=float32)}
+
