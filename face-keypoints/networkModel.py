@@ -1,3 +1,4 @@
+import find_mxnet
 import mxnet as mx
 from load_data import load
 from sklearn.cross_validation import train_test_split
