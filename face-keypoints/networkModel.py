@@ -3,6 +3,8 @@ import mxnet as mx
 from load_data import load
 from sklearn.cross_validation import train_test_split
 import logging
+import pdb as pdb
+import numpy as np
 
 
 def get_lenet():
@@ -50,7 +52,8 @@ head = '%(asctime)-15s Node[' + str(kv.rank) + '] %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=head)
 #model
 
-net = get_lenet()
+#net = get_lenet()
+net = get_mlp()
 model = mx.model.FeedForward(
         ctx                = mx.cpu(),
         symbol             = net,
@@ -60,8 +63,6 @@ model = mx.model.FeedForward(
         wd                 = 0.00001,
         initializer        = mx.init.Xavier(factor_type="in", magnitude=2.34),
         )
-model.fit(
-        X                  = train,
-        eval_data          = val,
-        batch_end_callback = mx.callback.Speedometer(128, 50),
-        epoch_end_callback = None)
+
+pdb.set_trace()
+model.fit(X=train, eval_data=val, batch_end_callback=mx.callback.Speedometer(128,50), epoch_end_callback=None)
