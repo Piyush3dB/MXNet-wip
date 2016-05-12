@@ -54,11 +54,19 @@ batch_end_callback.append(mx.callback.Speedometer(1,1))
 #batch_end_callback.append(mx.callback.ProgressBar(100))
 
 
+mon = mx.mon.Monitor(
+    1,                 # Print every 100 batches
+    stat_func=None,      # The statistics function defined above
+    pattern='fullyconnected0_weight|fullyconnected0_bias',  # A regular expression. Only arrays with name matching this pattern will be included.
+    sort=True)           # Sort output by name
+
+
+
 ##
 # Train the model
 ##
 model = mx.model.FeedForward(symbol=net, 
-	                         num_epoch=2000, 
+	                         num_epoch=300, 
 	                         learning_rate=0.01, 
 	                         epoch_size=1,
 	                         numpy_batch_size=1, 
@@ -67,19 +75,19 @@ print "Start training:"
 
 if USE_ND_ITER:
     trX = mx.io.NDArrayIter(X, label=Y, batch_size=1, shuffle=True, last_batch_handle='pad')
-    model.fit(X=trX,        batch_end_callback = batch_end_callback)
+    model.fit(X=trX, monitor=mon, batch_end_callback = batch_end_callback)
 
 elif USE_CSV_ITER:
     trX = mx.io.CSVIter(data_csv="./X.csv" , data_shape=(1,),
                         label_csv="./Y.csv", label_shape=(1,),
                         batch_size=1)
-    model.fit(X=trX,        batch_end_callback = batch_end_callback)
+    model.fit(X=trX, monitor=mon, batch_end_callback = batch_end_callback)
 
                            
 else:
     trX = X
     trY = Y
-    model.fit(X=trX, y=trY, batch_end_callback = batch_end_callback)
+    model.fit(X=trX, y=trY, monitor=mon, batch_end_callback = batch_end_callback)
 
 W = model.arg_params['fullyconnected0_weight'].asnumpy()[0]
 b = model.arg_params['fullyconnected0_bias'].asnumpy()[0]

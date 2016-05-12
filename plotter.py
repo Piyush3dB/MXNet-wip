@@ -494,9 +494,13 @@ def printNetwork(group, input_size):
 # Lightened CNN
 input_size = (1,1,128,128)
 #net, group = lightened_cnn_b()
-net, group = lightened_cnn_a()
+net, _ = lightened_cnn_a()
 
-pdb.set_trace()
+# get all parameter list
+group = net.get_internals()
+#arg_names = internals.list_arguments()
+
+#pdb.set_trace()
 
 #input_size = (1,1,28,28)
 #net, group = get_lenet()
