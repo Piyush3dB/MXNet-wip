@@ -4,6 +4,10 @@ import numpy as np
 import logging
 import pdb as pdb
 import matplotlib.pyplot as plt
+from sklearn.cross_validation import train_test_split
+
+NUM_EPOCH = 1000
+NUM_DATAS = 300
 
 #np.random.seed(0)
 
@@ -18,15 +22,16 @@ logging.basicConfig(level=logging.DEBUG, format=head)
 ##
 # Generate 101 training points
 ##
-X = np.linspace(-1, 1, 101)
+X = np.linspace(-1, 1, NUM_DATAS)
 Y = 2*X + np.random.randn(*X.shape) * 0.33 * 1
 
 #X = np.asarray([3.3,4.4,5.5,6.71,6.93,4.168,9.779,6.182,7.59,2.167,7.042,10.791,5.313,7.997,5.654,9.27,3.1])
 #Y = np.asarray([1.7,2.76,2.09,3.19,1.694,1.573,3.366,2.596,2.53,1.221,2.827,3.465,1.65,2.904,2.42,2.94,1.3])
 
 
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33, random_state = 42)
 
-
+#pdb.set_trace()
 
 
 
@@ -62,11 +67,13 @@ mon = mx.mon.Monitor(
 
 
 
+
+
 ##
 # Train the model
 ##
 model = mx.model.FeedForward(symbol=net, 
-	                         num_epoch=300, 
+	                         num_epoch=NUM_EPOCH, 
 	                         learning_rate=0.01, 
 	                         epoch_size=1,
 	                         numpy_batch_size=1, 
@@ -74,14 +81,15 @@ model = mx.model.FeedForward(symbol=net,
 print "Start training:"
 
 if USE_ND_ITER:
-    trX = mx.io.NDArrayIter(X, label=Y, batch_size=1, shuffle=True, last_batch_handle='pad')
-    model.fit(X=trX, monitor=mon, batch_end_callback = batch_end_callback)
+    trX = mx.io.NDArrayIter(data=X_train, label=Y_train, batch_size=1, shuffle=True, last_batch_handle='pad')
+    val = mx.io.NDArrayIter(data=X_test , label=Y_test , batch_size=10, shuffle=True)
+    model.fit(X=trX, eval_data=val, monitor=mon, batch_end_callback = batch_end_callback, epoch_end_callback=None)
 
 elif USE_CSV_ITER:
     trX = mx.io.CSVIter(data_csv="./X.csv" , data_shape=(1,),
                         label_csv="./Y.csv", label_shape=(1,),
                         batch_size=1)
-    model.fit(X=trX, monitor=mon, batch_end_callback = batch_end_callback)
+    model.fit(X=trX, eval_data=val, monitor=mon, batch_end_callback = batch_end_callback, epoch_end_callback=None)
 
                            
 else:
