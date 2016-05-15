@@ -29,7 +29,7 @@ paramFile = '../../MXNetModels/lenetMnistModel/lenet-0010.params';
 mxObj = MXNetForwarder(symblFile, paramFile);
 
 %% Load and resize the image
-[img, labels] = readMNIST(MNIST_DATA, MNIST_LABELS, 100, 0);
+[img, labels] = readMNIST(MNIST_DATA, MNIST_LABELS, 1, 0);
 
 %% Forward the image
 
@@ -44,8 +44,17 @@ mxObj = mxObj.free();
 
 %% find the predict label
 for i = 0:9
-    fprintf('%2d. Prob=%3f\n', i, pred(i+1));
+    fprintf('labels=%1d.  %2d. Prob=%3f\n', labels, i, pred(i+1));
 end
+
+%% Print model layers
+fprintf('\n\n LAYERS\n');
+sym = parse_json(mxObj.SymbolJson);
+for i = 1 : length(sym.nodes)
+    fprintf('layer name: %s\n', sym.nodes{i}.name);
+end
+
+
 
 figure(1);
 subplot(2,1,1);
