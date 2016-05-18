@@ -3,6 +3,7 @@ import mxnet as mx
 import numpy as np
 import matplotlib.pyplot as plt
 import logging
+import re
 import pdb as pdb
 
 logger = logging.getLogger()
@@ -490,30 +491,107 @@ def printNetwork(group, input_size):
     
     
     
+"""
+Remove the L character from shape inference output
+"""
+def remL(s): return eval(re.sub(r"L", "", str(s)))
+
+
+
+
+def printStats(group, input_size):
+
+
+    # Get list of arg and output names
+    arg_names    = group.list_arguments()
+    output_names = group.list_outputs()
+    
+    # Infer arg and output shapes
+    arg_shapes, output_shapes, aux_shapes = group.infer_shape(data=input_size)
+    
+    
+    
+    arg_shapes = map(remL, arg_shapes)
+    output_shapes = map(remL, output_shapes)
+    
+    # Display
+    nWtot = 0
+    print "Layer Params... "
+    for i in range(0,len(arg_shapes)):
+        nW = mltp(arg_shapes[i])
+        nWtot += nW
+        print '%35s -> %25s = %10s' % (arg_names[i], str(arg_shapes[i]), str(nW))
+    
+    print 'Total weights   = %d' % (nWtot)
+    print 'Total weights M = %f' % (nWtot/1000000.)
+    
+    
+    # Display
+    print "Layer Outputs... "
+    for i in xrange(len(output_names)):
+        print '[%3d] %35s -> %25s = %10s' % (i, output_names[i], output_shapes[i], str(mltp(output_shapes[i])))
+  
+
+
+
+def printStats2(group, input_size):
+
+
+    # Get list of arg and output names
+    arg_names    = group.list_arguments()
+    output_names = group.list_outputs()
+    
+    # Infer arg and output shapes
+    arg_shapes, output_shapes, aux_shapes = group.infer_shape(data=input_size)
+    
+    
+    
+    arg_shapes = map(remL, arg_shapes)
+    output_shapes = map(remL, output_shapes)
+    
+    # Display
+    nWtot = 0
+    print "Layer Params... "
+    for i in range(0,len(arg_shapes)):
+        nW = mltp(arg_shapes[i])
+        nWtot += nW
+        print '%35s -> %25s = %10s' % (arg_names[i], str(arg_shapes[i]), str(nW))
+    
+    print 'Total weights   = %d' % (nWtot)
+    print 'Total weights M = %f' % (nWtot/1000000.)
+    
+    
+    # Display
+    print "Layer Outputs... "
+    for i in xrange(len(output_names)):
+        print '[%3d] %35s -> %25s = %10s' % (i, output_names[i], output_shapes[i], str(mltp(output_shapes[i])))
+  
+
+
 
 # Lightened CNN
-input_size = (1,1,128,128)
-#net, group = lightened_cnn_b()
-net, _ = lightened_cnn_a()
+#input_size = (1,1,128,128)
+#net, _ = lightened_cnn_b()
+#net, _ = lightened_cnn_a()
 
 # get all parameter list
-group = net.get_internals()
+
 #arg_names = internals.list_arguments()
 
 #pdb.set_trace()
 
 #input_size = (1,1,28,28)
-#net, group = get_lenet()
-#net, group = get_mlp_like_convnet()
+#net, _ = get_lenet()
+#net, _ = get_mlp_like_convnet()
 
 
-#input_size = (1,1,1,28*28)
-#net, group = getMLP()
+input_size = (1,1,1,28*28)
+net, _ = getMLP()
 
-#input_size = (1,3, 224, 224)
-#net, group = get_symbol_squeeze()
-#net, group = get_symbol_vgg()
-#net, group = get_symbol_alexnet()
+input_size = (1,3, 224, 224)
+net, _ = get_symbol_squeeze()
+#net, _ = get_symbol_vgg()
+#net, _ = get_symbol_alexnet()
 
 ###
 ## Visulaise network
@@ -523,33 +601,20 @@ group = net.get_internals()
 #v = mx.viz.plot_network(net, shape={"data":(1, 1, 28, 28)})
 #v.render("LeNet simple")
 
+# Get all internals
+group = net.get_internals()
 
 
-# Get list of arg and output names
-arg_names    = group.list_arguments()
-output_names = group.list_outputs()
-
-# Infer arg and output shapes
-arg_shapes, output_shapes, aux_shapes = group.infer_shape(data=input_size)
 
 
-# Display
-nWtot = 0
-print "Layer Params... "
-for i in range(0,len(arg_shapes)):
-    nW = mltp(arg_shapes[i])
-    nWtot += nW
-    print '%35s -> %25s = %10s' % (arg_names[i], str(arg_shapes[i]), str(nW))
+printStats(group, input_size)
 
-print 'Total weights   = %d' % (nWtot)
-print 'Total weights M = %f' % (nWtot/1000000.)
+pdb.set_trace()
 
 
-# Display
-print "Layer Outputs... "
-for i in xrange(len(output_names)):
-    print '%35s -> %25s = %10s' % (output_names[i], output_shapes[i], str(mltp(output_shapes[i])))
-
-
-#pdb.set_trace()
-
+#
+#data
+#weight
+#bias
+#output
+#label
