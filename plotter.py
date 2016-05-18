@@ -420,12 +420,40 @@ def get_lenet():
 
 
 
+def printStats(group, input_size):
 
-def mltp(x):
-    s = 1
-    for i in range(0,len(x)):
-        s *= x[i]
-    return s
+
+    # Get list of arg and output names
+    arg_names    = group.list_arguments()
+    output_names = group.list_outputs()
+    
+    # Infer arg and output shapes
+    arg_shapes, output_shapes, aux_shapes = group.infer_shape(data=input_size)
+    
+    
+    
+    arg_shapes = map(remL, arg_shapes)
+    output_shapes = map(remL, output_shapes)
+    
+    # Display
+    nWtot = 0
+    print "Layer Params... "
+    for i in range(0,len(arg_shapes)):
+        nW = reduce(mltp, arg_shapes[i])
+        nWtot += nW
+        print '%35s -> %25s = %10s' % (arg_names[i], str(arg_shapes[i]), str(nW))
+    
+    print 'Total weights   = %d' % (nWtot)
+    print 'Total weights M = %f' % (nWtot/1000000.)
+    
+    
+    # Display
+    print "Layer Outputs... "
+    for i in xrange(len(output_names)):
+        print '[%3d] %35s -> %25s = %10s' % (i, output_names[i], output_shapes[i], str(reduce(mltp, output_shapes[i])))
+  
+
+
 
 
 
@@ -454,14 +482,12 @@ def getMLP():
     return mlp, group
 
 
+mltp = lambda x, y: x*y
+
+
 
 def printNetwork(group, input_size):
 
-    def mltp(x):
-        s = 1
-        for i in range(0,len(x)):
-            s *= x[i]
-        return s
 
     
     # Get list of arg and output names
@@ -476,7 +502,7 @@ def printNetwork(group, input_size):
     nWtot = 0
     print "Layer Params... "
     for i in range(0,len(arg_shapes)):
-        nW = mltp(arg_shapes[i])
+        nW = reduce(mltp,arg_shapes[i])
         nWtot += nW
         print '%35s -> %25s = %10s' % (arg_names[i], str(arg_shapes[i]), str(nW))
     
@@ -487,7 +513,7 @@ def printNetwork(group, input_size):
     # Display
     print "Layer Outputs... "
     for i in xrange(len(output_names)):
-        print '%35s -> %25s = %10s' % (output_names[i], output_shapes[i], str(mltp(output_shapes[i])))
+        print '%35s -> %25s = %10s' % (output_names[i], output_shapes[i], str(reduce(mltp, output_shapes[i])))
     
     
     
@@ -499,72 +525,46 @@ def remL(s): return eval(re.sub(r"L", "", str(s)))
 
 
 
-def printStats(group, input_size):
-
-
-    # Get list of arg and output names
-    arg_names    = group.list_arguments()
-    output_names = group.list_outputs()
-    
-    # Infer arg and output shapes
-    arg_shapes, output_shapes, aux_shapes = group.infer_shape(data=input_size)
-    
-    
-    
-    arg_shapes = map(remL, arg_shapes)
-    output_shapes = map(remL, output_shapes)
-    
-    # Display
-    nWtot = 0
-    print "Layer Params... "
-    for i in range(0,len(arg_shapes)):
-        nW = mltp(arg_shapes[i])
-        nWtot += nW
-        print '%35s -> %25s = %10s' % (arg_names[i], str(arg_shapes[i]), str(nW))
-    
-    print 'Total weights   = %d' % (nWtot)
-    print 'Total weights M = %f' % (nWtot/1000000.)
-    
-    
-    # Display
-    print "Layer Outputs... "
-    for i in xrange(len(output_names)):
-        print '[%3d] %35s -> %25s = %10s' % (i, output_names[i], output_shapes[i], str(mltp(output_shapes[i])))
-  
-
 
 
 def printStats2(group, input_size):
 
 
     # Get list of arg and output names
+    # Infer arg and output shapes
     arg_names    = group.list_arguments()
     output_names = group.list_outputs()
-    
-    # Infer arg and output shapes
     arg_shapes, output_shapes, aux_shapes = group.infer_shape(data=input_size)
-    
-    
-    
     arg_shapes = map(remL, arg_shapes)
     output_shapes = map(remL, output_shapes)
-    
-    # Display
-    nWtot = 0
-    print "Layer Params... "
-    for i in range(0,len(arg_shapes)):
-        nW = mltp(arg_shapes[i])
-        nWtot += nW
-        print '%35s -> %25s = %10s' % (arg_names[i], str(arg_shapes[i]), str(nW))
-    
-    print 'Total weights   = %d' % (nWtot)
-    print 'Total weights M = %f' % (nWtot/1000000.)
-    
-    
+
+    mltp = lambda x, y: x*y
+
+    nW = 0
+    nF = 0
+
+    # pdb.set_trace()
     # Display
     print "Layer Outputs... "
     for i in xrange(len(output_names)):
-        print '[%3d] %35s -> %25s = %10s' % (i, output_names[i], output_shapes[i], str(mltp(output_shapes[i])))
+        name  = output_names[i]
+        shape = output_shapes[i]
+        size = str(reduce(mltp,shape))
+
+
+
+        if ('weight' in name) or ('bias' in name):
+            space = ' '
+            nW += int(size)
+        else:
+            space = ' '*40
+            nF += int(size)
+
+
+        print '[%3d] %35s -> %s %20s = %8s' % (i, name, space, shape, size)
+
+    print nW
+    print nF
   
 
 
@@ -588,8 +588,8 @@ def printStats2(group, input_size):
 input_size = (1,1,1,28*28)
 net, _ = getMLP()
 
-input_size = (1,3, 224, 224)
-net, _ = get_symbol_squeeze()
+#input_size = (1,3, 224, 224)
+#net, _ = get_symbol_squeeze()
 #net, _ = get_symbol_vgg()
 #net, _ = get_symbol_alexnet()
 
@@ -609,7 +609,10 @@ group = net.get_internals()
 
 printStats(group, input_size)
 
-pdb.set_trace()
+print "Second function------->"
+printStats2(group, input_size)
+
+#pdb.set_trace()
 
 
 #
