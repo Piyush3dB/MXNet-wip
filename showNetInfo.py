@@ -48,6 +48,13 @@ net, _ = get_symbol_squeeze()
 #net, _ = get_symbol_alexnet()
 #net, _ = get_inception_bn_symbol()
 
+
+#
+# MLP for face model
+#
+input_size = (1, 1,1, 96*96)
+net = get_mlp_for_face()
+
 ###
 ## Visulaise network
 ###

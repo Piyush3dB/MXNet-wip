@@ -6,6 +6,8 @@ import logging
 import pdb as pdb
 import numpy as np
 
+# Set for repeatability
+mx.random.seed(1)
 
 def get_lenet():
     data = mx.symbol.Variable('data')
@@ -32,30 +34,48 @@ def get_mlp():
     """
     multi-layer perceptron
     """
+
+    outLabl = mx.sym.Variable('softmax_label')
+    
     data = mx.symbol.Variable('data')
     fc1  = mx.symbol.FullyConnected(data = data, name='fc1', num_hidden=100)
     act1 = mx.symbol.Activation(data = fc1, name='relu1', act_type="relu")
-    '''
-    fc2  = mx.symbol.FullyConnected(data = act1, name = 'fc2', num_hidden =100 )
-    act2 = mx.symbol.Activation(data = fc2, name='relu2', act_type="relu")
-    '''
-    fc2  = mx.symbol.FullyConnected(data = act1, name='fc2', num_hidden=30)
-    mlp  = mx.symbol.SoftmaxOutput(data = fc2, name = 'softmax')
-    return mlp
-#load data
+    fc2  = mx.symbol.FullyConnected(data = act1, name='fc2', num_hidden=1) # set hidden to 1 since np.shape(y)=(1,)
+    net  = mx.sym.LinearRegressionOutput(data=fc2, label=outLabl, name='linreg1')
+
+    return net
+
+#
+# Load data
+#
 X, y = load()
+# np.shape(y)=(1,).  
+# TODO np.shape(y) should be (30,) representing 15 key points encoded as as 2 values per point
+
+
+#
+# Setup iterators
+#
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state = 42)
-train = mx.io.NDArrayIter(data = X_train, label = y_train, batch_size = 128)
-val = mx.io.NDArrayIter(data = X_test, label = y_test, batch_size = 128)
+trainIter = mx.io.NDArrayIter(data = X_train, label = y_train, batch_size = 1)
+valIter   = mx.io.NDArrayIter(data = X_test , label = y_test , batch_size = 1)
+
+
+#
+# Multidevice kvstore setup and logging
+#
 kv = mx.kvstore.create('local')
 head = '%(asctime)-15s Node[' + str(kv.rank) + '] %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=head)
-#model
 
+
+#
+# Get model and train
+#
 #net = get_lenet()
 net = get_mlp()
 model = mx.model.FeedForward(
-        ctx                = mx.cpu(),
+        ctx                = mx.gpu(),
         symbol             = net,
         num_epoch          = 50,
         learning_rate      = 0.01,
@@ -63,6 +83,4 @@ model = mx.model.FeedForward(
         wd                 = 0.00001,
         initializer        = mx.init.Xavier(factor_type="in", magnitude=2.34),
         )
-
-pdb.set_trace()
-model.fit(X=train, eval_data=val, batch_end_callback=mx.callback.Speedometer(128,50), epoch_end_callback=None)
+model.fit(X=trainIter, eval_data=valIter, batch_end_callback=mx.callback.Speedometer(1,50), epoch_end_callback=None, eval_metric='rmse')

@@ -1,4 +1,28 @@
 
+
+
+
+
+def get_mlp_for_face():
+    """
+    multi-layer perceptron
+    """
+    data = mx.symbol.Variable('data')
+    fc1  = mx.symbol.FullyConnected(data = data, name='fc1', num_hidden=100)
+    act1 = mx.symbol.Activation(data = fc1, name='relu1', act_type="relu")
+    '''
+    fc2  = mx.symbol.FullyConnected(data = act1, name = 'fc2', num_hidden =100 )
+    act2 = mx.symbol.Activation(data = fc2, name='relu2', act_type="relu")
+    '''
+    fc2  = mx.symbol.FullyConnected(data = act1, name='fc2', num_hidden=30)
+    #mlp  = mx.symbol.SoftmaxOutput(data = fc2, name = 'softmax')
+    sm  = mx.sym.Variable('softmax_label')
+    mlp = mx.sym.LinearRegressionOutput(data=fc2, label=sm, name='linreg1')
+
+    return mlp
+
+
+
 ### Lightened CNN
 
 
