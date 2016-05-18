@@ -4,6 +4,23 @@ import re
 import pdb as pdb
 
 
+def _str2tuple(string):
+    """convert shape string to list, internal use only
+
+    Parameters
+    ----------
+    string: str
+        shape string
+
+    Returns
+    -------
+    list of str to represent shape
+    """
+    return re.findall(r"\d+", string)
+
+
+
+
 mltp = lambda x, y: x*y
 
 def remL(s): return eval(re.sub(r"L", "", str(s)))
@@ -16,7 +33,7 @@ def printStats(net, input_size):
     # Infer arg and output shapes
     arg_names    = group.list_arguments()
     output_names = group.list_outputs()
-    arg_shapes, output_shapes, aux_shapes = group.infer_shape(data=input_size)
+    arg_shapes, output_shapes, _ = group.infer_shape(data=input_size)
     arg_shapes = map(remL, arg_shapes)
     output_shapes = map(remL, output_shapes)
 

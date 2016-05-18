@@ -6,8 +6,11 @@ import logging
 import re
 import pdb as pdb
 import json
-from mxnet_utils import printStats
+from mxnet_utils import printStats, _str2tuple
 from networks import *
+
+
+
 
 """
 Script to load and print network information
@@ -39,10 +42,11 @@ net, _ = get_lenet_no_pooling2()
 #
 # Bigger nets
 #
-#input_size = (1,3, 224, 224)
-#net, _ = get_symbol_squeeze()
+input_size = (1,3, 224, 224)
+net, _ = get_symbol_squeeze()
 #net, _ = get_symbol_vgg()
 #net, _ = get_symbol_alexnet()
+#net, _ = get_inception_bn_symbol()
 
 ###
 ## Visulaise network
@@ -50,19 +54,22 @@ net, _ = get_lenet_no_pooling2()
 #mlp = getMLP();
 #net = mlp
 #v = mx.viz.plot_network(net, shape={"data":(1, 1, 28, 28)})
-#v.render("LeNet simple")
-
-# Get all internals
+#v.render("MLP simple")
 
 
 print "===PRINT NETOWRK STATS ==="
 printStats(net, input_size)
 
 
-#jsonNet = net.tojson()
+jsonNet = net.tojson()
 #print jsonNet
 
 #pdb.set_trace()
+
+conf = json.loads(net.tojson())
+nodes = conf["nodes"]
+heads = set([x[0] for x in conf["heads"]])
+
 
 print "===DONE==="
 

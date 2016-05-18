@@ -141,53 +141,58 @@ def get_symbol_alexnet(num_classes = 1000):
 
 
 
-def FireModelFactory(data, size):
-    if size == 1:
-        n_s1x1 = 16
-        n_e1x1 = 64
-        n_e3x3 = 64
-    elif size == 2:
-        n_s1x1 = 32
-        n_e1x1 = 128
-        n_e3x3 = 128
-    elif size == 3:
-        n_s1x1 = 48
-        n_e1x1 = 192
-        n_e3x3 = 192
-    elif size == 4:
-        n_s1x1 = 64
-        n_e1x1 = 256
-        n_e3x3 = 256
 
-    squeeze1x1 = mx.symbol.Convolution(
-            data   = data, 
-            kernel = (1,1), 
-            pad    = (0,0),
-            num_filter = n_s1x1 )
-
-    relu_squeeze1x1 = mx.symbol.Activation( data=squeeze1x1, act_type="relu" )
-
-    expand1x1 = mx.symbol.Convolution(
-            data   = relu_squeeze1x1,
-            kernel = (1,1),
-            pad    = (0,0),
-            num_filter = n_e1x1 )
-
-    relu_expand1x1 = mx.symbol.Activation(data=expand1x1, act_type="relu" )
-
-    expand3x3 = mx.symbol.Convolution(
-            data   = relu_squeeze1x1,
-            kernel = (3,3),
-            pad    = (1,1),
-            num_filter = n_e3x3 )
-
-    relu_expand3x3 = mx.symbol.Activation(data=expand3x3, act_type="relu" )
-    
-    concat = mx.symbol.Concat( *[relu_expand1x1, relu_expand3x3] )
-
-    return concat 
 
 def get_symbol_squeeze(num_classes = 1000):
+
+
+    def FireModelFactory(data, size):
+        if size == 1:
+            n_s1x1 = 16
+            n_e1x1 = 64
+            n_e3x3 = 64
+        elif size == 2:
+            n_s1x1 = 32
+            n_e1x1 = 128
+            n_e3x3 = 128
+        elif size == 3:
+            n_s1x1 = 48
+            n_e1x1 = 192
+            n_e3x3 = 192
+        elif size == 4:
+            n_s1x1 = 64
+            n_e1x1 = 256
+            n_e3x3 = 256
+    
+        squeeze1x1 = mx.symbol.Convolution(
+                data   = data, 
+                kernel = (1,1), 
+                pad    = (0,0),
+                num_filter = n_s1x1 )
+    
+        relu_squeeze1x1 = mx.symbol.Activation( data=squeeze1x1, act_type="relu" )
+    
+        expand1x1 = mx.symbol.Convolution(
+                data   = relu_squeeze1x1,
+                kernel = (1,1),
+                pad    = (0,0),
+                num_filter = n_e1x1 )
+    
+        relu_expand1x1 = mx.symbol.Activation(data=expand1x1, act_type="relu" )
+    
+        expand3x3 = mx.symbol.Convolution(
+                data   = relu_squeeze1x1,
+                kernel = (3,3),
+                pad    = (1,1),
+                num_filter = n_e3x3 )
+    
+        relu_expand3x3 = mx.symbol.Activation(data=expand3x3, act_type="relu" )
+        
+        concat = mx.symbol.Concat( *[relu_expand1x1, relu_expand3x3] )
+    
+        return concat 
+
+
     data = mx.symbol.Variable(name="data")
     #pdb.set_trace()
 
@@ -292,44 +297,47 @@ def get_symbol_vgg(num_classes = 1000):
 
 
 
-def ConvFactory(data, num_filter, kernel, stride=(1,1), pad=(0, 0), name=None, suffix=''):
-    conv = mx.symbol.Convolution(data=data, num_filter=num_filter, kernel=kernel, stride=stride, pad=pad, name='conv_%s%s' %(name, suffix))
-    bn = mx.symbol.BatchNorm(data=conv, name='bn_%s%s' %(name, suffix))
-    act = mx.symbol.Activation(data=bn, act_type='relu', name='relu_%s%s' %(name, suffix))
-    return act
-
-def InceptionFactoryA(data, num_1x1, num_3x3red, num_3x3, num_d3x3red, num_d3x3, pool, proj, name):
-    # 1x1
-    c1x1 = ConvFactory(data=data, num_filter=num_1x1, kernel=(1, 1), name=('%s_1x1' % name))
-    # 3x3 reduce + 3x3
-    c3x3r = ConvFactory(data=data, num_filter=num_3x3red, kernel=(1, 1), name=('%s_3x3' % name), suffix='_reduce')
-    c3x3 = ConvFactory(data=c3x3r, num_filter=num_3x3, kernel=(3, 3), pad=(1, 1), name=('%s_3x3' % name))
-    # double 3x3 reduce + double 3x3
-    cd3x3r = ConvFactory(data=data, num_filter=num_d3x3red, kernel=(1, 1), name=('%s_double_3x3' % name), suffix='_reduce')
-    cd3x3 = ConvFactory(data=cd3x3r, num_filter=num_d3x3, kernel=(3, 3), pad=(1, 1), name=('%s_double_3x3_0' % name))
-    cd3x3 = ConvFactory(data=cd3x3, num_filter=num_d3x3, kernel=(3, 3), pad=(1, 1), name=('%s_double_3x3_1' % name))
-    # pool + proj
-    pooling = mx.symbol.Pooling(data=data, kernel=(3, 3), stride=(1, 1), pad=(1, 1), pool_type=pool, name=('%s_pool_%s_pool' % (pool, name)))
-    cproj = ConvFactory(data=pooling, num_filter=proj, kernel=(1, 1), name=('%s_proj' %  name))
-    # concat
-    concat = mx.symbol.Concat(*[c1x1, c3x3, cd3x3, cproj], name='ch_concat_%s_chconcat' % name)
-    return concat
-
-def InceptionFactoryB(data, num_3x3red, num_3x3, num_d3x3red, num_d3x3, name):
-    # 3x3 reduce + 3x3
-    c3x3r = ConvFactory(data=data, num_filter=num_3x3red, kernel=(1, 1), name=('%s_3x3' % name), suffix='_reduce')
-    c3x3 = ConvFactory(data=c3x3r, num_filter=num_3x3, kernel=(3, 3), pad=(1, 1), stride=(2, 2), name=('%s_3x3' % name))
-    # double 3x3 reduce + double 3x3
-    cd3x3r = ConvFactory(data=data, num_filter=num_d3x3red, kernel=(1, 1),  name=('%s_double_3x3' % name), suffix='_reduce')
-    cd3x3 = ConvFactory(data=cd3x3r, num_filter=num_d3x3, kernel=(3, 3), pad=(1, 1), stride=(1, 1), name=('%s_double_3x3_0' % name))
-    cd3x3 = ConvFactory(data=cd3x3, num_filter=num_d3x3, kernel=(3, 3), pad=(1, 1), stride=(2, 2), name=('%s_double_3x3_1' % name))
-    # pool + proj
-    pooling = mx.symbol.Pooling(data=data, kernel=(3, 3), stride=(2, 2), pool_type="max", name=('max_pool_%s_pool' % name))
-    # concat
-    concat = mx.symbol.Concat(*[c3x3, cd3x3, pooling], name='ch_concat_%s_chconcat' % name)
-    return concat
 
 def get_inception_bn_symbol(num_classes=1000):
+
+    def ConvFactory(data, num_filter, kernel, stride=(1,1), pad=(0, 0), name=None, suffix=''):
+        conv = mx.symbol.Convolution(data=data, num_filter=num_filter, kernel=kernel, stride=stride, pad=pad, name='conv_%s%s' %(name, suffix))
+        bn = mx.symbol.BatchNorm(data=conv, name='bn_%s%s' %(name, suffix))
+        act = mx.symbol.Activation(data=bn, act_type='relu', name='relu_%s%s' %(name, suffix))
+        return act
+    
+    def InceptionFactoryA(data, num_1x1, num_3x3red, num_3x3, num_d3x3red, num_d3x3, pool, proj, name):
+        # 1x1
+        c1x1 = ConvFactory(data=data, num_filter=num_1x1, kernel=(1, 1), name=('%s_1x1' % name))
+        # 3x3 reduce + 3x3
+        c3x3r = ConvFactory(data=data, num_filter=num_3x3red, kernel=(1, 1), name=('%s_3x3' % name), suffix='_reduce')
+        c3x3 = ConvFactory(data=c3x3r, num_filter=num_3x3, kernel=(3, 3), pad=(1, 1), name=('%s_3x3' % name))
+        # double 3x3 reduce + double 3x3
+        cd3x3r = ConvFactory(data=data, num_filter=num_d3x3red, kernel=(1, 1), name=('%s_double_3x3' % name), suffix='_reduce')
+        cd3x3 = ConvFactory(data=cd3x3r, num_filter=num_d3x3, kernel=(3, 3), pad=(1, 1), name=('%s_double_3x3_0' % name))
+        cd3x3 = ConvFactory(data=cd3x3, num_filter=num_d3x3, kernel=(3, 3), pad=(1, 1), name=('%s_double_3x3_1' % name))
+        # pool + proj
+        pooling = mx.symbol.Pooling(data=data, kernel=(3, 3), stride=(1, 1), pad=(1, 1), pool_type=pool, name=('%s_pool_%s_pool' % (pool, name)))
+        cproj = ConvFactory(data=pooling, num_filter=proj, kernel=(1, 1), name=('%s_proj' %  name))
+        # concat
+        concat = mx.symbol.Concat(*[c1x1, c3x3, cd3x3, cproj], name='ch_concat_%s_chconcat' % name)
+        return concat
+    
+    def InceptionFactoryB(data, num_3x3red, num_3x3, num_d3x3red, num_d3x3, name):
+        # 3x3 reduce + 3x3
+        c3x3r = ConvFactory(data=data, num_filter=num_3x3red, kernel=(1, 1), name=('%s_3x3' % name), suffix='_reduce')
+        c3x3 = ConvFactory(data=c3x3r, num_filter=num_3x3, kernel=(3, 3), pad=(1, 1), stride=(2, 2), name=('%s_3x3' % name))
+        # double 3x3 reduce + double 3x3
+        cd3x3r = ConvFactory(data=data, num_filter=num_d3x3red, kernel=(1, 1),  name=('%s_double_3x3' % name), suffix='_reduce')
+        cd3x3 = ConvFactory(data=cd3x3r, num_filter=num_d3x3, kernel=(3, 3), pad=(1, 1), stride=(1, 1), name=('%s_double_3x3_0' % name))
+        cd3x3 = ConvFactory(data=cd3x3, num_filter=num_d3x3, kernel=(3, 3), pad=(1, 1), stride=(2, 2), name=('%s_double_3x3_1' % name))
+        # pool + proj
+        pooling = mx.symbol.Pooling(data=data, kernel=(3, 3), stride=(2, 2), pool_type="max", name=('max_pool_%s_pool' % name))
+        # concat
+        concat = mx.symbol.Concat(*[c3x3, cd3x3, pooling], name='ch_concat_%s_chconcat' % name)
+        return concat
+    
+    
     # data
     data = mx.symbol.Variable(name="data")
     # stage 1
