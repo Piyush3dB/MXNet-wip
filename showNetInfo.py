@@ -25,7 +25,8 @@ Script to load and print network information
 # LeNET and MLP Convnet Style
 #
 input_size = (1,1,28,28)
-net, _ = get_lenet()
+net, _ = get_lenet_no_pooling2()
+#net, _ = get_lenet()
 #net, _ = get_mlp_like_convnet()
 
 

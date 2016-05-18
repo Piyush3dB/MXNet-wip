@@ -372,6 +372,73 @@ import pdb as pdb
 Collection of network definitions
 """
 
+def get_lenet_no_pooling2():
+    """
+    Lenet with the Conv layer kernel resized so that no pooling layers are required.
+    """
+    data = mx.symbol.Variable('data')
+
+
+    # first conv
+    conv1 = mx.symbol.Convolution(data=data, kernel=(5,5), num_filter=20, stride=(2,2), pad=(2,2))
+    tanh1 = mx.symbol.Activation(data=conv1, act_type="tanh")
+    #pool1 = mx.symbol.Pooling(data=tanh1, pool_type="max", kernel=(2,2), stride=(2,2))
+    pool1 = tanh1
+
+    # second conv
+    conv2 = mx.symbol.Convolution(data=pool1, kernel=(5,5), num_filter=50, stride=(2,2), pad=(1,1))
+    tanh2 = mx.symbol.Activation(data=conv2, act_type="tanh")
+    #pool2 = mx.symbol.Pooling(data=tanh2, pool_type="max", kernel=(2,2), stride=(2,2))
+    pool2 = tanh2
+    
+    # first fullc
+    flatten = mx.symbol.Flatten(data=pool2)
+    fc1     = mx.symbol.FullyConnected(data=flatten, num_hidden=500)
+    tanh3   = mx.symbol.Activation(data=fc1, act_type="tanh")
+    # second fullc
+    fc2  = mx.symbol.FullyConnected(data=tanh3, num_hidden=10)
+    # loss
+    lenet = mx.symbol.SoftmaxOutput(data=fc2, name='softmax')
+
+    group = mx.symbol.Group([data, conv1, tanh1, pool1, conv2, tanh2, pool2, flatten, fc1, tanh3, fc2, lenet ])
+    #print group.list_outputs()
+
+    return lenet, group
+
+
+def get_lenet_no_pooling():
+    """
+    Lenet with the Conv layer kernel resized so that no pooling layers are required.
+    """
+    data = mx.symbol.Variable('data')
+
+
+    # first conv
+    conv1 = mx.symbol.Convolution(data=data, kernel=(6,6), num_filter=20, stride=(2,2))
+    tanh1 = mx.symbol.Activation(data=conv1, act_type="tanh")
+    #pool1 = mx.symbol.Pooling(data=tanh1, pool_type="max", kernel=(2,2), stride=(2,2))
+    pool1 = tanh1
+
+    # second conv
+    conv2 = mx.symbol.Convolution(data=pool1, kernel=(6,6), num_filter=50, stride=(2,2))
+    tanh2 = mx.symbol.Activation(data=conv2, act_type="tanh")
+    #pool2 = mx.symbol.Pooling(data=tanh2, pool_type="max", kernel=(2,2), stride=(2,2))
+    pool2 = tanh2
+
+    # first fullc
+    flatten = mx.symbol.Flatten(data=pool2)
+    fc1     = mx.symbol.FullyConnected(data=flatten, num_hidden=500)
+    tanh3   = mx.symbol.Activation(data=fc1, act_type="tanh")
+    # second fullc
+    fc2  = mx.symbol.FullyConnected(data=tanh3, num_hidden=10)
+    # loss
+    lenet = mx.symbol.SoftmaxOutput(data=fc2, name='softmax')
+
+    group = mx.symbol.Group([data, conv1, tanh1, pool1, conv2, tanh2, pool2, flatten, fc1, tanh3, fc2, lenet ])
+    #print group.list_outputs()
+
+    return lenet, group
+
 
 def get_lenet():
     """
