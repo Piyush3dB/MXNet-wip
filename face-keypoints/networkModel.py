@@ -10,6 +10,10 @@ import numpy as np
 mx.random.seed(1)
 
 def get_lenet():
+
+    outLabl = mx.sym.Variable('softmax_label')
+
+
     data = mx.symbol.Variable('data')
     # first conv
     conv1 = mx.symbol.Convolution(data=data, kernel=(5,5), num_filter=20)
@@ -26,10 +30,13 @@ def get_lenet():
     fc1 = mx.symbol.FullyConnected(data=flatten, num_hidden=500)
     tanh3 = mx.symbol.Activation(data=fc1, act_type="tanh")
     # second fullc
-    fc2 = mx.symbol.FullyConnected(data=tanh3, num_hidden=30)
+    fc2 = mx.symbol.FullyConnected(data=tanh3, num_hidden=1)
     # loss
-    lenet = mx.symbol.SoftmaxOutput(data=fc2, name='softmax')
-    return lenet
+    net  = mx.sym.LinearRegressionOutput(data=fc2, label=outLabl, name='linreg1')
+    
+    return net
+
+
 def get_mlp():
     """
     multi-layer perceptron
@@ -77,7 +84,7 @@ net = get_mlp()
 model = mx.model.FeedForward(
         ctx                = mx.gpu(),
         symbol             = net,
-        num_epoch          = 50,
+        num_epoch          = 5,
         learning_rate      = 0.01,
         momentum           = 0.9,
         wd                 = 0.00001,
