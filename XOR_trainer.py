@@ -79,7 +79,7 @@ printStats(net, input_size)
 model = mx.model.FeedForward(
         ctx                = mx.gpu(),
         symbol             = net,
-        num_epoch          = 200,
+        num_epoch          = 20,
         learning_rate      = 0.2,
         momentum           = 0.9,
         wd                 = 0.00001,
@@ -103,4 +103,5 @@ model.fit(X=trainIter,
 predictions = model.predict(valIter)
 print predictions
 
+pdb.set_trace()
 

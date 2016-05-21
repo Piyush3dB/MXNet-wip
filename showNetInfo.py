@@ -9,6 +9,8 @@ import json
 from mxnet_utils import printStats, _str2tuple
 from networks import *
 
+from visualization import *
+
 
 
 
@@ -52,16 +54,17 @@ net, _ = get_symbol_squeeze()
 #
 # MLP for face model
 #
-input_size = (1, 1,1, 96*96)
-net = get_mlp_for_face()
+#input_size = (1, 1,1, 96*96)
+#net = get_mlp_for_face()
 
 ###
 ## Visulaise network
 ###
 #mlp = getMLP();
 #net = mlp
-#v = mx.viz.plot_network(net, shape={"data":(1, 1, 28, 28)})
-#v.render("MLP simple")
+
+v = plot_network(net, shape={"data":input_size})
+v.render("NNet")
 
 
 print "===PRINT NETOWRK STATS ==="
@@ -69,7 +72,7 @@ printStats(net, input_size)
 
 
 jsonNet = net.tojson()
-#print jsonNet
+print jsonNet
 
 #pdb.set_trace()
 
