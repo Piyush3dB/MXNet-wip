@@ -44,8 +44,8 @@ net, _ = get_lenet_no_pooling2()
 #
 # Bigger nets
 #
-input_size = (1,3, 224, 224)
-net, _ = get_symbol_squeeze()
+#input_size = (1,3, 224, 224)
+#net, _ = get_symbol_squeeze()
 #net, _ = get_symbol_vgg()
 #net, _ = get_symbol_alexnet()
 #net, _ = get_inception_bn_symbol()
@@ -54,8 +54,9 @@ net, _ = get_symbol_squeeze()
 #
 # MLP for face model
 #
-#input_size = (1, 1,1, 96*96)
+input_size = (1, 1, 96, 96)
 #net = get_mlp_for_face()
+net = get_lenet_for_face()
 
 ###
 ## Visulaise network
@@ -63,8 +64,8 @@ net, _ = get_symbol_squeeze()
 #mlp = getMLP();
 #net = mlp
 
-v = plot_network(net, shape={"data":input_size})
-v.render("NNet")
+#v = plot_network(net, shape={"data":input_size})
+#v.render("NNet")
 
 
 print "===PRINT NETOWRK STATS ==="
@@ -72,7 +73,7 @@ printStats(net, input_size)
 
 
 jsonNet = net.tojson()
-print jsonNet
+#print jsonNet
 
 #pdb.set_trace()
 

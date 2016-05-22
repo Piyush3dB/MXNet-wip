@@ -27,7 +27,7 @@ def get_xor_net():
 # Load data
 #
 xTrain = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-yTrain = np.array([0, 1, 1, 0])
+yTrain = np.array( [0,      1,      1,      0    ])
 
 
 #
