@@ -28,6 +28,7 @@ def _str2tuple(string):
     return re.findall(r"\d+", string)
 
 
+
 def plot_network(symbol, title="plot", shape=None, node_attrs={}):
     """convert symbol to dot object for visualization
 
@@ -119,9 +120,10 @@ def plot_network(symbol, title="plot", shape=None, node_attrs={}):
         print 'name  ' + name
         print 'label ' + label
 
-        #pdb.set_trace()
+        pdb.set_trace()
 
         dot.node(name=name, label=label, **attr)
+
 
     # add edges
     for i in range(len(nodes)):

@@ -6,7 +6,7 @@ import logging
 import re
 import pdb as pdb
 import json
-from mxnet_utils import printStats, _str2tuple
+from mxnet_utils import printStats, _str2tuple, net2dot
 from networks import *
 
 from visualization import *
@@ -64,8 +64,10 @@ net = get_lenet_for_face()
 #mlp = getMLP();
 #net = mlp
 
-#v = plot_network(net, shape={"data":input_size})
-#v.render("NNet")
+#v = mx.viz.plot_network(net, shape={"data":input_size})
+v = net2dot(net, shape={"data":input_size})
+v.render("NNet")
+net.save('NNet.json')
 
 
 print "===PRINT NETOWRK STATS ==="
@@ -73,9 +75,9 @@ printStats(net, input_size)
 
 
 jsonNet = net.tojson()
-#print jsonNet
+print jsonNet
 
-#pdb.set_trace()
+pdb.set_trace()
 
 conf = json.loads(net.tojson())
 nodes = conf["nodes"]
