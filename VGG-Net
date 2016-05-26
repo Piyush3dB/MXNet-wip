@@ -1,0 +1,142 @@
+digraph plot {
+	graph [bgcolor=white fontcolor=black fontsize=16 label=" " rankdir=BT]
+	node [color=black fillcolor="#006699" fontcolor=black fontname="Courier New" shape=box style=filled]
+	edge [arrowhead=normal color=black fontcolor=black fontname="Courier New" fontsize=12 style=solid]
+		data [label="data \l shape: (5x3x224x224) \l752640 [00 %]" arrowhead=normal color=red fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv1_1_weight [label="conv1_1_weight \l shape: (64x3x3x3) \l1728 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv1_1_bias [label="conv1_1_bias \l shape: (64x) \l64 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv1_1 [label="Convolution
+\lparam: {\l  no_bias: False, \l  kernel: (3,3), \l  num_group: 1, \l  dilate: (1,1), \l  num_filter: 64, \l  stride: (1,1), \l  pad: (1,1), \l  workspace: 512\l}\l\lname: conv1_1" arrowhead=normal fillcolor="#fb8072" fontname="Courier New" fontsize=10 shape=box style=filled]
+		relu1_1 [label="Activation
+\lparam: {\l  act_type: relu\l}\l\lname: relu1_1" arrowhead=normal fillcolor="#ffffb3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		pool1 [label="Pooling
+\lparam: {\l  pool_type: max, \l  kernel: (2,2), \l  pad: (0,0), \l  stride: (2,2)\l}\l\lname: pool1" arrowhead=normal fillcolor="#80b1d3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		conv2_1_weight [label="conv2_1_weight \l shape: (128x64x3x3) \l73728 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv2_1_bias [label="conv2_1_bias \l shape: (128x) \l128 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv2_1 [label="Convolution
+\lparam: {\l  no_bias: False, \l  kernel: (3,3), \l  num_group: 1, \l  dilate: (1,1), \l  num_filter: 128, \l  stride: (1,1), \l  pad: (1,1), \l  workspace: 512\l}\l\lname: conv2_1" arrowhead=normal fillcolor="#fb8072" fontname="Courier New" fontsize=10 shape=box style=filled]
+		relu2_1 [label="Activation
+\lparam: {\l  act_type: relu\l}\l\lname: relu2_1" arrowhead=normal fillcolor="#ffffb3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		pool2 [label="Pooling
+\lparam: {\l  pool_type: max, \l  kernel: (2,2), \l  pad: (0,0), \l  stride: (2,2)\l}\l\lname: pool2" arrowhead=normal fillcolor="#80b1d3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		conv3_1_weight [label="conv3_1_weight \l shape: (256x128x3x3) \l294912 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv3_1_bias [label="conv3_1_bias \l shape: (256x) \l256 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv3_1 [label="Convolution
+\lparam: {\l  no_bias: False, \l  kernel: (3,3), \l  num_group: 1, \l  dilate: (1,1), \l  num_filter: 256, \l  stride: (1,1), \l  pad: (1,1), \l  workspace: 512\l}\l\lname: conv3_1" arrowhead=normal fillcolor="#fb8072" fontname="Courier New" fontsize=10 shape=box style=filled]
+		relu3_1 [label="Activation
+\lparam: {\l  act_type: relu\l}\l\lname: relu3_1" arrowhead=normal fillcolor="#ffffb3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		conv3_2_weight [label="conv3_2_weight \l shape: (256x256x3x3) \l589824 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv3_2_bias [label="conv3_2_bias \l shape: (256x) \l256 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv3_2 [label="Convolution
+\lparam: {\l  no_bias: False, \l  kernel: (3,3), \l  num_group: 1, \l  dilate: (1,1), \l  num_filter: 256, \l  stride: (1,1), \l  pad: (1,1), \l  workspace: 512\l}\l\lname: conv3_2" arrowhead=normal fillcolor="#fb8072" fontname="Courier New" fontsize=10 shape=box style=filled]
+		relu3_2 [label="Activation
+\lparam: {\l  act_type: relu\l}\l\lname: relu3_2" arrowhead=normal fillcolor="#ffffb3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		pool3 [label="Pooling
+\lparam: {\l  pool_type: max, \l  kernel: (2,2), \l  pad: (0,0), \l  stride: (2,2)\l}\l\lname: pool3" arrowhead=normal fillcolor="#80b1d3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		conv4_1_weight [label="conv4_1_weight \l shape: (512x256x3x3) \l1179648 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv4_1_bias [label="conv4_1_bias \l shape: (512x) \l512 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv4_1 [label="Convolution
+\lparam: {\l  no_bias: False, \l  kernel: (3,3), \l  num_group: 1, \l  dilate: (1,1), \l  num_filter: 512, \l  stride: (1,1), \l  pad: (1,1), \l  workspace: 512\l}\l\lname: conv4_1" arrowhead=normal fillcolor="#fb8072" fontname="Courier New" fontsize=10 shape=box style=filled]
+		relu4_1 [label="Activation
+\lparam: {\l  act_type: relu\l}\l\lname: relu4_1" arrowhead=normal fillcolor="#ffffb3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		conv4_2_weight [label="conv4_2_weight \l shape: (512x512x3x3) \l2359296 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv4_2_bias [label="conv4_2_bias \l shape: (512x) \l512 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv4_2 [label="Convolution
+\lparam: {\l  no_bias: False, \l  kernel: (3,3), \l  num_group: 1, \l  dilate: (1,1), \l  num_filter: 512, \l  stride: (1,1), \l  pad: (1,1), \l  workspace: 512\l}\l\lname: conv4_2" arrowhead=normal fillcolor="#fb8072" fontname="Courier New" fontsize=10 shape=box style=filled]
+		relu4_2 [label="Activation
+\lparam: {\l  act_type: relu\l}\l\lname: relu4_2" arrowhead=normal fillcolor="#ffffb3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		pool4 [label="Pooling
+\lparam: {\l  pool_type: max, \l  kernel: (2,2), \l  pad: (0,0), \l  stride: (2,2)\l}\l\lname: pool4" arrowhead=normal fillcolor="#80b1d3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		conv5_1_weight [label="conv5_1_weight \l shape: (512x512x3x3) \l2359296 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv5_1_bias [label="conv5_1_bias \l shape: (512x) \l512 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv5_1 [label="Convolution
+\lparam: {\l  no_bias: False, \l  kernel: (3,3), \l  num_group: 1, \l  dilate: (1,1), \l  num_filter: 512, \l  stride: (1,1), \l  pad: (1,1), \l  workspace: 512\l}\l\lname: conv5_1" arrowhead=normal fillcolor="#fb8072" fontname="Courier New" fontsize=10 shape=box style=filled]
+		relu5_1 [label="Activation
+\lparam: {\l  act_type: relu\l}\l\lname: relu5_1" arrowhead=normal fillcolor="#ffffb3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		conv5_2_weight [label="conv5_2_weight \l shape: (512x512x3x3) \l2359296 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv5_2_bias [label="conv5_2_bias \l shape: (512x) \l512 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		conv5_2 [label="Convolution
+\lparam: {\l  no_bias: False, \l  kernel: (3,3), \l  num_group: 1, \l  dilate: (1,1), \l  num_filter: 512, \l  stride: (1,1), \l  pad: (1,1), \l  workspace: 512\l}\l\lname: conv5_2" arrowhead=normal fillcolor="#fb8072" fontname="Courier New" fontsize=10 shape=box style=filled]
+		conv1_2 [label="Activation
+\lparam: {\l  act_type: relu\l}\l\lname: conv1_2" arrowhead=normal fillcolor="#ffffb3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		pool5 [label="Pooling
+\lparam: {\l  pool_type: max, \l  kernel: (2,2), \l  pad: (0,0), \l  stride: (2,2)\l}\l\lname: pool5" arrowhead=normal fillcolor="#80b1d3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		flatten [label="Flatten
+\lparam: {}\l\lname: flatten" arrowhead=normal fillcolor="#fdb462" fontname="Courier New" fontsize=10 shape=box style=filled]
+		fc6_weight [label="fc6_weight \l shape: (4096x25088) \l102760448 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		fc6_bias [label="fc6_bias \l shape: (4096x) \l4096 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		fc6 [label="FullyConnected
+\lparam: {\l  no_bias: False, \l  num_hidden: 4096\l}\l\lname: fc6" arrowhead=normal fillcolor="#fb8072" fontname="Courier New" fontsize=10 shape=box style=filled]
+		relu6 [label="Activation
+\lparam: {\l  act_type: relu\l}\l\lname: relu6" arrowhead=normal fillcolor="#ffffb3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		drop6 [label="Dropout
+\lparam: {\l  p: 0.5\l}\l\lname: drop6" arrowhead=normal fillcolor="#fccde6" fontname="Courier New" fontsize=10 shape=box style=filled]
+		fc7_weight [label="fc7_weight \l shape: (4096x4096) \l16777216 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		fc7_bias [label="fc7_bias \l shape: (4096x) \l4096 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		fc7 [label="FullyConnected
+\lparam: {\l  no_bias: False, \l  num_hidden: 4096\l}\l\lname: fc7" arrowhead=normal fillcolor="#fb8072" fontname="Courier New" fontsize=10 shape=box style=filled]
+		relu7 [label="Activation
+\lparam: {\l  act_type: relu\l}\l\lname: relu7" arrowhead=normal fillcolor="#ffffb3" fontname="Courier New" fontsize=10 shape=box style=filled]
+		drop7 [label="Dropout
+\lparam: {\l  p: 0.5\l}\l\lname: drop7" arrowhead=normal fillcolor="#fccde6" fontname="Courier New" fontsize=10 shape=box style=filled]
+		fc8_weight [label="fc8_weight \l shape: (1000x4096) \l4096000 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		fc8_bias [label="fc8_bias \l shape: (1000x) \l1000 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		fc8 [label="FullyConnected
+\lparam: {\l  no_bias: False, \l  num_hidden: 1000\l}\l\lname: fc8" arrowhead=normal fillcolor="#fb8072" fontname="Courier New" fontsize=10 shape=box style=filled]
+		softmax_label [label="softmax_label \l shape: (5x) \l5 [00 %]" arrowhead=normal fillcolor="#8dd3c7" fontname="Courier New" fontsize=10 shape=box style="rounded,filled"]
+		softmax [label="SoftmaxOutput
+\lparam: {\l  use_ignore: False, \l  grad_scale: 1, \l  multi_output: False, \l  ignore_label: -1\l}\l\lname: softmax" arrowhead=normal fillcolor="#fccdef" fontname="Courier New" fontsize=10 shape=box style=filled]
+			conv1_1 -> data [label="(5x3x224x224)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv1_1 -> conv1_1_weight [label="(64x3x3x3)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			conv1_1 -> conv1_1_bias [label="(64x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			relu1_1 -> conv1_1 [label="(5x64x224x224)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			pool1 -> relu1_1 [label="(5x64x224x224)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv2_1 -> pool1 [label="(5x64x112x112)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv2_1 -> conv2_1_weight [label="(128x64x3x3)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			conv2_1 -> conv2_1_bias [label="(128x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			relu2_1 -> conv2_1 [label="(5x128x112x112)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			pool2 -> relu2_1 [label="(5x128x112x112)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv3_1 -> pool2 [label="(5x128x56x56)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv3_1 -> conv3_1_weight [label="(256x128x3x3)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			conv3_1 -> conv3_1_bias [label="(256x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			relu3_1 -> conv3_1 [label="(5x256x56x56)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv3_2 -> relu3_1 [label="(5x256x56x56)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv3_2 -> conv3_2_weight [label="(256x256x3x3)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			conv3_2 -> conv3_2_bias [label="(256x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			relu3_2 -> conv3_2 [label="(5x256x56x56)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			pool3 -> relu3_2 [label="(5x256x56x56)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv4_1 -> pool3 [label="(5x256x28x28)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv4_1 -> conv4_1_weight [label="(512x256x3x3)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			conv4_1 -> conv4_1_bias [label="(512x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			relu4_1 -> conv4_1 [label="(5x512x28x28)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv4_2 -> relu4_1 [label="(5x512x28x28)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv4_2 -> conv4_2_weight [label="(512x512x3x3)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			conv4_2 -> conv4_2_bias [label="(512x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			relu4_2 -> conv4_2 [label="(5x512x28x28)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			pool4 -> relu4_2 [label="(5x512x28x28)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv5_1 -> pool4 [label="(5x512x14x14)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv5_1 -> conv5_1_weight [label="(512x512x3x3)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			conv5_1 -> conv5_1_bias [label="(512x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			relu5_1 -> conv5_1 [label="(5x512x14x14)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv5_2 -> relu5_1 [label="(5x512x14x14)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			conv5_2 -> conv5_2_weight [label="(512x512x3x3)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			conv5_2 -> conv5_2_bias [label="(512x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			conv1_2 -> conv5_2 [label="(5x512x14x14)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			pool5 -> conv1_2 [label="(5x512x14x14)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			flatten -> pool5 [label="(5x512x7x7)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			fc6 -> flatten [label="(5x25088)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			fc6 -> fc6_weight [label="(4096x25088)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			fc6 -> fc6_bias [label="(4096x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			relu6 -> fc6 [label="(5x4096)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			drop6 -> relu6 [label="(5x4096)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			fc7 -> drop6 [label="(5x4096)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			fc7 -> fc7_weight [label="(4096x4096)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			fc7 -> fc7_bias [label="(4096x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			relu7 -> fc7 [label="(5x4096)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			drop7 -> relu7 [label="(5x4096)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			fc8 -> drop7 [label="(5x4096)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			fc8 -> fc8_weight [label="(1000x4096)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			fc8 -> fc8_bias [label="(1000x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+			softmax -> fc8 [label="(5x1000)" arrowhead=diamond arrowtail=open color=red dir=back fontcolor=navy fontname="Courier New" fontsize=10 penwidth=4.0]
+			softmax -> softmax_label [label="(5x)" arrowhead=diamond arrowtail=open dir=back fontcolor=navy fontname="Courier New" fontsize=10]
+}
