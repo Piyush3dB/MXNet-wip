@@ -98,8 +98,8 @@ logging.basicConfig(level=logging.DEBUG, format=head)
 #
 # Get model and train
 #
-net = get_lenet()
-#net = get_mlp()
+#net = get_lenet()
+net = get_mlp()
 
 model = mx.model.FeedForward(
         ctx                = mx.gpu(),
