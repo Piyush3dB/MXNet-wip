@@ -1,5 +1,6 @@
 // Path for c_predict_api
 #include <c_predict_api.h>
+#include <c_api.h>
 #include <MXNetForwarder.h>
 
     /* Constructor */
@@ -7,6 +8,9 @@ MXNetForwarder::MXNetForwarder(int w, int h, int c, const char* SymbolJson, cons
     
     // Image dimenstions and size used during forwarding
     this->image_size = w*h*c;
+    this->SymbolJson = SymbolJson;
+    
+
     
     // Parameters
     const char* input_key[1] = {"data"};
@@ -31,6 +35,46 @@ MXNetForwarder::MXNetForwarder(int w, int h, int c, const char* SymbolJson, cons
                  &this->pCtx);
     
 }
+
+void MXNetForwarder::InferShape(){
+
+        MXSymbolCreateFromJSON(this->SymbolJson, &this->handle);
+
+#if 0
+
+        arg_shape_size;
+        arg_shape_ndim = ctypes.POINTER(mx_uint)()
+        arg_shape_data = ctypes.POINTER(ctypes.POINTER(mx_uint))()
+        out_shape_size = mx_uint()
+        out_shape_ndim = ctypes.POINTER(mx_uint)()
+        out_shape_data = ctypes.POINTER(ctypes.POINTER(mx_uint))()
+        aux_shape_size = mx_uint()
+        aux_shape_ndim = ctypes.POINTER(mx_uint)()
+        aux_shape_data = ctypes.POINTER(ctypes.POINTER(mx_uint))()
+
+
+    MXNET_DLL int MXSymbolInferShape(this->SymbolJson, //SymbolHandle sym,
+                                     mx_uint num_args,
+                                 const char** keys,
+                                 const mx_uint *arg_ind_ptr,
+                                 const mx_uint *arg_shape_data,
+                                 mx_uint *in_shape_size,
+                                 const mx_uint **in_shape_ndim,
+                                 const mx_uint ***in_shape_data,
+                                 mx_uint *out_shape_size,
+                                 const mx_uint **out_shape_ndim,
+                                 const mx_uint ***out_shape_data,
+                                 mx_uint *aux_shape_size,
+                                 const mx_uint **aux_shape_ndim,
+                                 const mx_uint ***aux_shape_data,
+                                 int *complete);
+
+#endif
+
+}
+
+
+
 
 void MXNetForwarder::Forward(std::vector<mx_float> image_data){
 

@@ -14,8 +14,8 @@
 #include <stdint.h>
 
 // Path for c_predict_api
-#include <c_predict_api.h>
-#include <MXNetForwarder.h>
+#include "c_predict_api.h"
+#include "MXNetForwarder.h"
 
 #include <iostream>
 #include <fstream>
@@ -137,6 +137,8 @@ std::vector<mx_float> LoadImage(std::string imgFname, int imgSize){
 
 
 
+
+
 int main(int argc, char* argv[]) {
 
     //-- Load the input image
@@ -145,8 +147,8 @@ int main(int argc, char* argv[]) {
 
     //-- Load MXNet network and parameters
     std::cout << "\nLoading network parameters...\n";
-    BufferFile json_data( "../../MXNetModels/cifar1000VGGmodel/Inception_BN-symbol.json");
-    BufferFile param_data("../../MXNetModels/cifar1000VGGmodel/Inception_BN-0039.params");
+    BufferFile json_data( "../../MXNetModels/newModel/model/Inception_BN-symbol.json");
+    BufferFile param_data("../../MXNetModels/newModel/model/Inception_BN-0039.params");
 
     //-- Create Forwarder context
     std::cout << "Constructor...\n";
@@ -169,7 +171,7 @@ int main(int argc, char* argv[]) {
 
     //-- Display results
     std::cout << "Sort and display predictions...\n";
-    auto synset = LoadSynset("../../MXNetModels/cifar1000VGGmodel/synset.txt");
+    auto synset = LoadSynset("../../MXNetModels/newModel/model/synset.txt");
     PrintOutputResult(resultsMap, synset);
 
     return 0;
@@ -181,12 +183,15 @@ Should see in console:
 
 
 Top 5 predictions:
-39.470 =>  tiger cat 
-22.070 =>  tabby, tabby cat 
-20.210 =>  Egyptian cat 
-12.200 =>  lynx, catamount 
-0.620 =>  Persian cat 
-
-
+29.710 =>  tiger cat 
+26.580 =>  lynx, catamount 
+19.800 =>  Egyptian cat 
+17.770 =>  tabby, tabby cat 
+2.610 =>  kit fox, Vulpes macrotis 
+0.460 =>  Siamese cat, Siamese 
+0.420 =>  red fox, Vulpes vulpes 
+0.200 =>  Persian cat 
+0.170 =>  plastic bag 
+0.130 =>  window screen 
 
 */

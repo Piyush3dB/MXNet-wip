@@ -3,6 +3,7 @@
 #define MXNET_FORWARDER_H_
 // Path for c_predict_api
 #include <c_predict_api.h>
+#include <c_api.h>
 
 #include <vector>
 #include <map>
@@ -24,10 +25,15 @@ class MXNetForwarder {
     /* Image dimension */
     int image_size = 0;
 
+    /* Handle for symbol */
+    void* handle;
+
 
     MXNetForwarder(int w, int h, int c, const char* SymbolJson, const char* NetParams, int paramLen);
 
     void Forward(std::vector<mx_float> image_data);
+    
+    void InferShape();
 
     std::multimap<int,int> SortOutputResult(const std::vector<float>& data);
 

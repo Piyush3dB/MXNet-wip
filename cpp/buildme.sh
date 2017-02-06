@@ -4,8 +4,9 @@ rm -rf mxnet_predict-all.o mxnet_predict-all.cc c_predict_api.h main.o app
 
 
 # Copy files
-cp ../../mxnet/amalgamation/mxnet_predict-all.cc .
-cp ../../mxnet/include/mxnet/c_predict_api.h .
+cp ../../mxnet-head/amalgamation/mxnet_predict-all.cc .
+cp ../../mxnet-head/include/mxnet/c_predict_api.h .
+cp ../../mxnet-head/include/mxnet/c_api.h .
 
 # From amalgamation
 g++ -std=c++11 -I../../OpenBLAS/installed -fPIC -o mxnet_predict-all.o -c mxnet_predict-all.cc
