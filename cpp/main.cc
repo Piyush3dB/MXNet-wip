@@ -136,7 +136,56 @@ std::vector<mx_float> LoadImage(std::string imgFname, int imgSize){
 }
 
 
+#if 0
 
+//WIP here
+
+void Symbol::InferExecutorArrays(
+    const Context &context, std::vector<NDArray> *arg_arrays,
+    std::vector<NDArray> *grad_arrays, std::vector<OpReqType> *grad_reqs,
+    std::vector<NDArray> *aux_arrays,
+    const std::map<std::string, NDArray> &args_map,
+    const std::map<std::string, NDArray> &arg_grad_store,
+    const std::map<std::string, OpReqType> &grad_req_type,
+    const std::map<std::string, NDArray> &aux_map) const {
+
+  const auto arg_name_list = ListArguments();
+  std::vector<std::vector<mx_uint> > in_shapes, aux_shapes, out_shapes;
+  std::map<std::string, std::vector<mx_uint> > arg_shapes;
+
+  for (const auto &arg_name : arg_name_list) {
+    auto iter = args_map.find(arg_name);
+    if (iter != args_map.end()) {
+      arg_shapes[arg_name] = iter->second.GetShape();
+    }
+  }
+
+  InferShape(arg_shapes, &in_shapes, &aux_shapes, &out_shapes);
+
+  for (size_t i = 0; i < in_shapes.size(); ++i) {
+    const auto &shape = in_shapes[i];
+    const auto &arg_name = arg_name_list[i];
+    auto iter_arg = args_map.find(arg_name);
+    if (iter_arg != args_map.end()) {
+      arg_arrays->push_back(iter_arg->second);
+    } else {
+      arg_arrays->push_back(NDArray(shape, context, false));
+      NDArray::SampleGaussian(0, 1, &arg_arrays->back());
+    }
+    auto iter_grad = arg_grad_store.find(arg_name);
+    if (iter_grad != arg_grad_store.end()) {
+      grad_arrays->push_back(iter_grad->second);
+    } else {
+      grad_arrays->push_back(NDArray(shape, context, false));
+    }
+    auto iter_req = grad_req_type.find(arg_name);
+    if (iter_req != grad_req_type.end()) {
+      grad_reqs->push_back(iter_req->second);
+    } else {
+      grad_reqs->push_back(OpReqType::kWriteTo);
+    }
+  }
+#endif
 
 
 int main(int argc, char* argv[]) {
@@ -156,6 +205,10 @@ int main(int argc, char* argv[]) {
     auto param  = (const char *) param_data.GetBuffer();
     auto nParam = static_cast<size_t>(param_data.GetLength());
     MXNetForwarder mxObj(224, 224, 3, symb, param, nParam);
+
+    //-- Infer shape
+//    mxObj.InferShape(arg_shapes, &in_shapes, &aux_shapes, &out_shapes);
+
 
     //-- Forward the image throught the network
     std::cout << "Forward data...\n";

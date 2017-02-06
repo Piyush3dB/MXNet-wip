@@ -22,7 +22,7 @@ MXNetForwarder::MXNetForwarder(int w, int h, int c, const char* SymbolJson, cons
                                         static_cast<mx_uint>(w),
                                         static_cast<mx_uint>(h) };
     
-    //-- Create Predictor
+    // Create Predictor
     MXPredCreate(SymbolJson,
                  NetParams,
                  paramLen,
@@ -34,30 +34,120 @@ MXNetForwarder::MXNetForwarder(int w, int h, int c, const char* SymbolJson, cons
                  input_shape_data,
                  &this->pCtx);
     
+    // Create symbol from JSON
+    MXSymbolCreateFromJSON(this->SymbolJson, &this->handle);
 }
 
-void MXNetForwarder::InferShape(){
 
-        MXSymbolCreateFromJSON(this->SymbolJson, &this->handle);
+void MXNetForwarder::InferShape(
+    const std::map<std::string, std::vector<mx_uint> > &arg_shapes,
+    std::vector<std::vector<mx_uint> > *in_shape,
+    std::vector<std::vector<mx_uint> > *aux_shape,
+    std::vector<std::vector<mx_uint> > *out_shape) const {
+
+  std::vector<const char *> keys;
+  std::vector<mx_uint> arg_ind_ptr;
+  std::vector<mx_uint> arg_shape_data;
+
+  for (const auto &arg : arg_shapes) {
+    keys.push_back(arg.first.c_str());
+    arg_ind_ptr.push_back(arg_shape_data.size());
+    for (auto i : arg.second) {
+      arg_shape_data.push_back(i);
+    }
+  }
+  arg_ind_ptr.push_back(arg_shape_data.size());
+
+  mx_uint in_shape_size;
+  const mx_uint *in_shape_ndim;
+  const mx_uint **in_shape_data;
+  mx_uint out_shape_size;
+  const mx_uint *out_shape_ndim;
+  const mx_uint **out_shape_data;
+  mx_uint aux_shape_size;
+  const mx_uint *aux_shape_ndim;
+  const mx_uint **aux_shape_data;
+  int complete;
+
+  MXSymbolInferShape(this->handle, keys.size(), keys.data(),
+                     arg_ind_ptr.data(), arg_shape_data.data(),
+                     &in_shape_size, &in_shape_ndim, &in_shape_data,
+                     &out_shape_size, &out_shape_ndim, &out_shape_data,
+                     &aux_shape_size, &aux_shape_ndim, &aux_shape_data,
+                     &complete);
+
+  if (complete) {
+    for (mx_uint i = 0; i < in_shape_size; ++i) {
+      in_shape->push_back(std::vector<mx_uint>());
+      for (mx_uint j = 0; j < in_shape_ndim[i]; ++j) {
+        (*in_shape)[i].push_back(in_shape_data[i][j]);
+      }
+    }
+    for (mx_uint i = 0; i < aux_shape_size; ++i) {
+      aux_shape->push_back(std::vector<mx_uint>());
+      for (mx_uint j = 0; j < aux_shape_ndim[i]; ++j) {
+        (*aux_shape)[i].push_back(aux_shape_data[i][j]);
+      }
+    }
+    for (mx_uint i = 0; i < out_shape_size; ++i) {
+      out_shape->push_back(std::vector<mx_uint>());
+      for (mx_uint j = 0; j < out_shape_ndim[i]; ++j) {
+        (*out_shape)[i].push_back(out_shape_data[i][j]);
+      }
+    }
+  }
+}
+
 
 #if 0
 
-        arg_shape_size;
-        arg_shape_ndim = ctypes.POINTER(mx_uint)()
-        arg_shape_data = ctypes.POINTER(ctypes.POINTER(mx_uint))()
-        out_shape_size = mx_uint()
-        out_shape_ndim = ctypes.POINTER(mx_uint)()
-        out_shape_data = ctypes.POINTER(ctypes.POINTER(mx_uint))()
-        aux_shape_size = mx_uint()
-        aux_shape_ndim = ctypes.POINTER(mx_uint)()
-        aux_shape_data = ctypes.POINTER(ctypes.POINTER(mx_uint))()
+void MXNetForwarder::InferShape(){
 
 
-    MXNET_DLL int MXSymbolInferShape(this->SymbolJson, //SymbolHandle sym,
-                                     mx_uint num_args,
+        unsigned int   arg_shape_size;  // = mx_uint()
+        unsigned int*  arg_shape_ndim;  // = ctypes.POINTER(mx_uint)()
+        unsigned int** arg_shape_data;  // = ctypes.POINTER(ctypes.POINTER(mx_uint))()
+
+        unsigned int   out_shape_size;  // = mx_uint()
+        unsigned int*  out_shape_ndim;  // = ctypes.POINTER(mx_uint)()
+        unsigned int** out_shape_data;  // = ctypes.POINTER(ctypes.POINTER(mx_uint))()
+
+        unsigned int   aux_shape_size;  // = mx_uint()
+        unsigned int*  aux_shape_ndim;  // = ctypes.POINTER(mx_uint)()
+        unsigned int** aux_shape_data;  // = ctypes.POINTER(ctypes.POINTER(mx_uint))()
+
+        int complete; // = ctypes.c_int()
+
+        int retval;
+
+        retval = MXSymbolInferShape(
+            this->handle,
+
+            mx_uint(len(indptr) - 1),
+            c_array(ctypes.c_char_p, keys),
+            c_array(mx_uint, indptr),
+            c_array(mx_uint, sdata),
+            
+            &arg_shape_size,
+            &arg_shape_ndim,
+            &arg_shape_data,
+            &out_shape_size,
+            &out_shape_ndim,
+            &out_shape_data,
+            &aux_shape_size,
+            &aux_shape_ndim,
+            &aux_shape_data,
+            &complete);
+
+
+    MXNET_DLL int MXSymbolInferShape(
+                                 this->SymbolJson, //SymbolHandle sym,
+                                 
+                                 mx_uint num_args,
                                  const char** keys,
                                  const mx_uint *arg_ind_ptr,
                                  const mx_uint *arg_shape_data,
+
                                  mx_uint *in_shape_size,
                                  const mx_uint **in_shape_ndim,
                                  const mx_uint ***in_shape_data,
@@ -69,9 +159,9 @@ void MXNetForwarder::InferShape(){
                                  const mx_uint ***aux_shape_data,
                                  int *complete);
 
+}
 #endif
 
-}
 
 
 

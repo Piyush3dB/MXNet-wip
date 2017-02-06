@@ -33,7 +33,11 @@ class MXNetForwarder {
 
     void Forward(std::vector<mx_float> image_data);
     
-    void InferShape();
+      void InferShape(
+      const std::map<std::string, std::vector<mx_uint> > &arg_shapes,
+      std::vector<std::vector<mx_uint> > *in_shape,
+      std::vector<std::vector<mx_uint> > *aux_shape,
+      std::vector<std::vector<mx_uint> > *out_shape) const;
 
     std::multimap<int,int> SortOutputResult(const std::vector<float>& data);
 
