@@ -42,12 +42,29 @@ MXNetForwarder::MXNetForwarder(int w, int h, int c, char* SymbolJson, const char
 /*
 void MXNetForwarder::InferShape(
     const std::map<std::string, std::vector<mx_uint> > &arg_shapes,
-    std::vector<std::vector<mx_uint> > *in_shape,
+    std::vector<std::vector<mx_uint> > *arg_shape,
     std::vector<std::vector<mx_uint> > *aux_shape,
     std::vector<std::vector<mx_uint> > *out_shape) const {
 */
 
 void MXNetForwarder::InferShape() const {
+
+
+
+
+  /*
+  Get the internals
+  */
+
+
+  int MXSymbolGetInternals(SymbolHandle symbol, SymbolHandle *out);
+
+
+
+  std::vector<std::vector<mx_uint> > arg_shape;
+  std::vector<std::vector<mx_uint> > aux_shape;
+  std::vector<std::vector<mx_uint> > out_shape;
+  //std::map<std::string, std::vector<mx_uint> > arg_shape;
 
 #if 0
   std::vector<const char *> keys;
@@ -68,33 +85,36 @@ void MXNetForwarder::InferShape() const {
   mx_uint num_args = 1;
   std::string key = "data";
   auto keys = key.c_str();
-  const mx_uint arg_ind_ptr[2]    = {0, 4};
-  const mx_uint arg_shape_data[4] = {1, 3, 224, 224};
+  const mx_uint in_ind_ptr[2]    = {0, 4};
+  const mx_uint in_shape_data[4] = {1, 3, 224, 224};
   /**/
 
-  mx_uint in_shape_size;
-  const mx_uint *in_shape_ndim;
-  const mx_uint **in_shape_data;
-  mx_uint out_shape_size;
-  const mx_uint *out_shape_ndim;
+  mx_uint         arg_shape_size;
+  const mx_uint * arg_shape_ndim;
+  const mx_uint **arg_shape_data;
+
+  mx_uint         out_shape_size;
+  const mx_uint * out_shape_ndim;
   const mx_uint **out_shape_data;
-  mx_uint aux_shape_size;
-  const mx_uint *aux_shape_ndim;
+  
+  mx_uint         aux_shape_size;
+  const mx_uint * aux_shape_ndim;
   const mx_uint **aux_shape_data;
+  
   int complete;
 
 
 
-  MXSymbolInferShape(this->SymbolJson,
+  MXSymbolInferShape(this->handle,
                      
                      num_args,
                      &keys, 
-                     arg_ind_ptr,
-                     arg_shape_data,
+                     in_ind_ptr,
+                     in_shape_data,
 
-                     &in_shape_size,
-                     &in_shape_ndim,
-                     &in_shape_data,
+                     &arg_shape_size,
+                     &arg_shape_ndim,
+                     &arg_shape_data,
 
                      &out_shape_size,
                      &out_shape_ndim,
@@ -107,6 +127,40 @@ void MXNetForwarder::InferShape() const {
                      &complete);
 
 
+
+printf("%d\n", arg_shape_size);
+printf("%d\n", out_shape_size);
+printf("%d\n", aux_shape_size);
+  
+  #if 0
+  if (complete) {
+    for (mx_uint i = 0; i < arg_shape_size; ++i) {
+      arg_shape.push_back(std::vector<mx_uint>());
+      for (mx_uint j = 0; j < arg_shape_ndim[i]; ++j) {
+        arg_shape[i].push_back(arg_shape_data[i][j]);
+        printf("in[%d,%d]\n", i, j);
+      }
+    }
+    for (mx_uint i = 0; i < aux_shape_size; ++i) {
+      aux_shape.push_back(std::vector<mx_uint>());
+      for (mx_uint j = 0; j < aux_shape_ndim[i]; ++j) {
+        aux_shape[i].push_back(aux_shape_data[i][j]);
+        printf("aux[%d,%d]\n", i, j);
+      }
+    }
+    for (mx_uint i = 0; i < out_shape_size; ++i) {
+      out_shape.push_back(std::vector<mx_uint>());
+      for (mx_uint j = 0; j < out_shape_ndim[i]; ++j) {
+        out_shape[i].push_back(out_shape_data[i][j]);
+        printf("out[%d,%d]\n", i, j);
+      }
+    }
+  }
+
+  #endif
+
+  printf("Shape Inferred\n");
+
 }
 
 #if 0
@@ -114,31 +168,11 @@ void MXNetForwarder::InferShape() const {
 
   MXSymbolInferShape(this->handle, keys.size(), keys.data(),
                      arg_ind_ptr.data(), arg_shape_data.data(),
-                     &in_shape_size, &in_shape_ndim, &in_shape_data,
+                     &arg_shape_size, &arg_shape_ndim, &arg_shape_data,
                      &out_shape_size, &out_shape_ndim, &out_shape_data,
                      &aux_shape_size, &aux_shape_ndim, &aux_shape_data,
                      &complete);
 
-  if (complete) {
-    for (mx_uint i = 0; i < in_shape_size; ++i) {
-      in_shape->push_back(std::vector<mx_uint>());
-      for (mx_uint j = 0; j < in_shape_ndim[i]; ++j) {
-        (*in_shape)[i].push_back(in_shape_data[i][j]);
-      }
-    }
-    for (mx_uint i = 0; i < aux_shape_size; ++i) {
-      aux_shape->push_back(std::vector<mx_uint>());
-      for (mx_uint j = 0; j < aux_shape_ndim[i]; ++j) {
-        (*aux_shape)[i].push_back(aux_shape_data[i][j]);
-      }
-    }
-    for (mx_uint i = 0; i < out_shape_size; ++i) {
-      out_shape->push_back(std::vector<mx_uint>());
-      for (mx_uint j = 0; j < out_shape_ndim[i]; ++j) {
-        (*out_shape)[i].push_back(out_shape_data[i][j]);
-      }
-    }
-  }
 }
 
 
@@ -190,9 +224,9 @@ void MXNetForwarder::InferShape(){
                                  const mx_uint *arg_ind_ptr,
                                  const mx_uint *arg_shape_data,
 
-                                 mx_uint *in_shape_size,
-                                 const mx_uint **in_shape_ndim,
-                                 const mx_uint ***in_shape_data,
+                                 mx_uint *arg_shape_size,
+                                 const mx_uint **arg_shape_ndim,
+                                 const mx_uint ***arg_shape_data,
                                  mx_uint *out_shape_size,
                                  const mx_uint **out_shape_ndim,
                                  const mx_uint ***out_shape_data,
