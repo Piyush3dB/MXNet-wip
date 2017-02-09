@@ -17,7 +17,7 @@ class MXNetForwarder {
     PredictorHandle pCtx = nullptr;
 
     /* Json symbol string */
-    const char* SymbolJson;
+    char* SymbolJson;
 
     /* Network parameters */
     const char* NetParams;
@@ -29,15 +29,11 @@ class MXNetForwarder {
     void* handle;
 
 
-    MXNetForwarder(int w, int h, int c, const char* SymbolJson, const char* NetParams, int paramLen);
+    MXNetForwarder(int w, int h, int c, char* SymbolJson, const char* NetParams, int paramLen);
 
     void Forward(std::vector<mx_float> image_data);
     
-      void InferShape(
-      const std::map<std::string, std::vector<mx_uint> > &arg_shapes,
-      std::vector<std::vector<mx_uint> > *in_shape,
-      std::vector<std::vector<mx_uint> > *aux_shape,
-      std::vector<std::vector<mx_uint> > *out_shape) const;
+      void InferShape() const;
 
     std::multimap<int,int> SortOutputResult(const std::vector<float>& data);
 

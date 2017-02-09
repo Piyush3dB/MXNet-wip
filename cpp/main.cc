@@ -141,8 +141,10 @@ std::vector<mx_float> LoadImage(std::string imgFname, int imgSize){
 //WIP here
 
 void Symbol::InferExecutorArrays(
-    const Context &context, std::vector<NDArray> *arg_arrays,
-    std::vector<NDArray> *grad_arrays, std::vector<OpReqType> *grad_reqs,
+    const Context &context, 
+    std::vector<NDArray> *arg_arrays,
+    std::vector<NDArray> *grad_arrays, 
+    std::vector<OpReqType> *grad_reqs,
     std::vector<NDArray> *aux_arrays,
     const std::map<std::string, NDArray> &args_map,
     const std::map<std::string, NDArray> &arg_grad_store,
@@ -150,7 +152,9 @@ void Symbol::InferExecutorArrays(
     const std::map<std::string, NDArray> &aux_map) const {
 
   const auto arg_name_list = ListArguments();
-  std::vector<std::vector<mx_uint> > in_shapes, aux_shapes, out_shapes;
+  std::vector<std::vector<mx_uint> > in_shapes;
+  std::vector<std::vector<mx_uint> > aux_shapes;
+  std::vector<std::vector<mx_uint> > out_shapes;
   std::map<std::string, std::vector<mx_uint> > arg_shapes;
 
   for (const auto &arg_name : arg_name_list) {
@@ -162,6 +166,7 @@ void Symbol::InferExecutorArrays(
 
   InferShape(arg_shapes, &in_shapes, &aux_shapes, &out_shapes);
 
+#if 0
   for (size_t i = 0; i < in_shapes.size(); ++i) {
     const auto &shape = in_shapes[i];
     const auto &arg_name = arg_name_list[i];
@@ -187,6 +192,10 @@ void Symbol::InferExecutorArrays(
   }
 #endif
 
+}
+
+#endif
+
 
 int main(int argc, char* argv[]) {
 
@@ -201,13 +210,16 @@ int main(int argc, char* argv[]) {
 
     //-- Create Forwarder context
     std::cout << "Constructor...\n";
-    auto symb   = (const char *) json_data.GetBuffer();
+    auto symb   = (char *) json_data.GetBuffer();
     auto param  = (const char *) param_data.GetBuffer();
     auto nParam = static_cast<size_t>(param_data.GetLength());
     MXNetForwarder mxObj(224, 224, 3, symb, param, nParam);
 
     //-- Infer shape
-//    mxObj.InferShape(arg_shapes, &in_shapes, &aux_shapes, &out_shapes);
+    //int inputShape = {1,3, 224, 224};
+    //string inputName = "data";
+    //printf("%s\n", mxObj.SymbolJson);
+    mxObj.InferShape();
 
 
     //-- Forward the image throught the network

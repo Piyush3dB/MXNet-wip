@@ -2,9 +2,10 @@
 #include <c_predict_api.h>
 #include <c_api.h>
 #include <MXNetForwarder.h>
+#include <string.h>
 
     /* Constructor */
-MXNetForwarder::MXNetForwarder(int w, int h, int c, const char* SymbolJson, const char* NetParams, int paramLen){
+MXNetForwarder::MXNetForwarder(int w, int h, int c, char* SymbolJson, const char* NetParams, int paramLen){
     
     // Image dimenstions and size used during forwarding
     this->image_size = w*h*c;
@@ -38,13 +39,17 @@ MXNetForwarder::MXNetForwarder(int w, int h, int c, const char* SymbolJson, cons
     MXSymbolCreateFromJSON(this->SymbolJson, &this->handle);
 }
 
-
+/*
 void MXNetForwarder::InferShape(
     const std::map<std::string, std::vector<mx_uint> > &arg_shapes,
     std::vector<std::vector<mx_uint> > *in_shape,
     std::vector<std::vector<mx_uint> > *aux_shape,
     std::vector<std::vector<mx_uint> > *out_shape) const {
+*/
 
+void MXNetForwarder::InferShape() const {
+
+#if 0
   std::vector<const char *> keys;
   std::vector<mx_uint> arg_ind_ptr;
   std::vector<mx_uint> arg_shape_data;
@@ -57,6 +62,15 @@ void MXNetForwarder::InferShape(
     }
   }
   arg_ind_ptr.push_back(arg_shape_data.size());
+#endif
+
+  /**/
+  mx_uint num_args = 1;
+  std::string key = "data";
+  auto keys = key.c_str();
+  const mx_uint arg_ind_ptr[2]    = {0, 4};
+  const mx_uint arg_shape_data[4] = {1, 3, 224, 224};
+  /**/
 
   mx_uint in_shape_size;
   const mx_uint *in_shape_ndim;
@@ -68,6 +82,35 @@ void MXNetForwarder::InferShape(
   const mx_uint *aux_shape_ndim;
   const mx_uint **aux_shape_data;
   int complete;
+
+
+
+  MXSymbolInferShape(this->SymbolJson,
+                     
+                     num_args,
+                     &keys, 
+                     arg_ind_ptr,
+                     arg_shape_data,
+
+                     &in_shape_size,
+                     &in_shape_ndim,
+                     &in_shape_data,
+
+                     &out_shape_size,
+                     &out_shape_ndim,
+                     &out_shape_data,
+
+                     &aux_shape_size,
+                     &aux_shape_ndim,
+                     &aux_shape_data,
+
+                     &complete);
+
+
+}
+
+#if 0
+
 
   MXSymbolInferShape(this->handle, keys.size(), keys.data(),
                      arg_ind_ptr.data(), arg_shape_data.data(),
@@ -99,7 +142,6 @@ void MXNetForwarder::InferShape(
 }
 
 
-#if 0
 
 void MXNetForwarder::InferShape(){
 
